@@ -37,7 +37,12 @@ const handleEscape = (e: KeyboardEvent) => {
 
 // Handle click outside
 const handleClickOutside = (e: MouseEvent) => {
-  if (props.closeOnClickOutside && modalContent.value && !modalContent.value.contains(e.target as Node)) {
+  if (
+    props.closeOnClickOutside &&
+    modalContent.value &&
+    e.target &&
+    !modalContent.value.contains(e.target as Node)
+  ) {
     close()
   }
 }
