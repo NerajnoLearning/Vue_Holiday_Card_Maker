@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useReducedMotion } from '@/composables/useReducedMotion'
 
 interface Props {
   size?: 'sm' | 'md' | 'lg' | 'xl'
@@ -14,6 +15,8 @@ const props = withDefaults(defineProps<Props>(), {
   fullScreen: false,
   message: ''
 })
+
+const { prefersReducedMotion } = useReducedMotion()
 
 const sizeClasses = {
   sm: 'h-4 w-4 border-2',
@@ -30,8 +33,10 @@ const colorClasses = {
 }
 
 const spinnerClasses = computed(() => {
+  const animation = prefersReducedMotion.value ? 'animate-pulse' : 'animate-spin'
   return [
-    'animate-spin rounded-full border-t-transparent border-r-transparent',
+    'rounded-full border-t-transparent border-r-transparent',
+    animation,
     sizeClasses[props.size],
     colorClasses[props.color]
   ].join(' ')

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useReducedMotion } from '@/composables/useReducedMotion'
 import type { HolidayTemplate } from '@/types/template'
 
 interface Props {
@@ -8,6 +10,18 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   selected: false
+})
+
+const { prefersReducedMotion } = useReducedMotion()
+
+const cardClasses = computed(() => {
+  const base = 'relative overflow-hidden rounded-lg border-4 touch-manipulation'
+  const animations = prefersReducedMotion.value
+    ? 'transition-colors duration-200'
+    : 'transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95'
+  const border = props.selected ? 'border-blue-500 shadow-lg' : 'border-gray-200 hover:border-gray-300'
+
+  return `${base} ${animations} ${border}`
 })
 </script>
 
