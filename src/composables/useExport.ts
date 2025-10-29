@@ -64,7 +64,7 @@ export const useExport = () => {
             backoff: true,
             onRetry: (attempt) => {
               retryCount.value = attempt
-              progress.value = 30 + (attempt * 10)
+              progress.value = Math.min(30 + (attempt * 10), 90)
             }
           })
         : await exportFn()
