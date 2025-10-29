@@ -18,7 +18,7 @@ const emitRemove = () => emit('remove')
     <!-- Image -->
     <img
       :src="props.src"
-      :alt="props.alt || 'Photo preview'"
+      :alt="props.alt || 'Uploaded photo preview'"
       class="w-full h-48 object-cover rounded-lg"
       :class="{ 'opacity-50': props.loading }"
     />
