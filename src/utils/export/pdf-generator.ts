@@ -58,7 +58,6 @@ export const generatePDF = async (
     filename = 'greeting-card.pdf',
     quality = 0.95,
     orientation = 'portrait',
-    format = 'a4',
     includeTimestamp = true
   } = options
 
