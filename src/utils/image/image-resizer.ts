@@ -85,6 +85,37 @@ const COMPRESSION_LEVELS = {
 	'image/webp': 0.8, // Good quality for WebP
 } as const;
 
+// Cache WebP support detection to avoid expensive repeated checks
+let webpSupportCache: boolean | null = null;
+
+/**
+ * Checks if the browser supports WebP format.
+ * Uses a small 1x1 canvas to minimize performance impact.
+ * Result is cached after first check.
+ */
+function supportsWebP(): boolean {
+	if (webpSupportCache !== null) {
+		return webpSupportCache;
+	}
+
+	try {
+		// Create a minimal 1x1 canvas for the check
+		const testCanvas = document.createElement('canvas');
+		testCanvas.width = 1;
+		testCanvas.height = 1;
+		
+		// Check if toDataURL returns a valid WebP data URL
+		const dataUrl = testCanvas.toDataURL('image/webp');
+		webpSupportCache = dataUrl.startsWith('data:image/webp');
+		
+		return webpSupportCache;
+	} catch (e) {
+		// If any error occurs, assume WebP is not supported
+		webpSupportCache = false;
+		return false;
+	}
+}
+
 export const resizeImage = (
 	file: File,
 	options: ResizeOptions,
@@ -148,8 +179,7 @@ export const resizeImage = (
 						}
 
 						// Create WebP version if original is a different format and browser supports it
-						const shouldConvertToWebP = file.type !== 'image/webp' &&
-							canvas.toDataURL('image/webp').startsWith('data:image/webp');
+						const shouldConvertToWebP = file.type !== 'image/webp' && supportsWebP();
 
 						const processBlob = (finalBlob: Blob, type: string) => {
 							const url = URL.createObjectURL(finalBlob);
