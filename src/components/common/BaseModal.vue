@@ -120,7 +120,7 @@ const maxWidthClass = {
     <Transition name="modal-fade">
       <div
         v-if="props.modelValue"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
+        class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto"
         @click="handleClickOutside"
       >
         <!-- Overlay -->
@@ -130,7 +130,11 @@ const maxWidthClass = {
         <div
           ref="modalContent"
           :class="[
-            'relative bg-white rounded-lg shadow-2xl w-full transform transition-all',
+            'relative bg-white w-full transform transition-all',
+            'rounded-t-2xl sm:rounded-lg',
+            'shadow-2xl',
+            'max-h-[90vh] sm:max-h-[85vh]',
+            'overflow-y-auto',
             maxWidthClass
           ]"
           role="dialog"
@@ -161,13 +165,29 @@ const maxWidthClass = {
   opacity: 0;
 }
 
-.modal-fade-enter-from .relative {
-  transform: scale(0.95) translateY(-20px);
-  opacity: 0;
+/* Mobile: slide up from bottom */
+@media (max-width: 640px) {
+  .modal-fade-enter-from .relative {
+    transform: translateY(100%);
+    opacity: 1;
+  }
+
+  .modal-fade-leave-to .relative {
+    transform: translateY(100%);
+    opacity: 1;
+  }
 }
 
-.modal-fade-leave-to .relative {
-  transform: scale(0.95) translateY(20px);
-  opacity: 0;
+/* Desktop: scale and fade */
+@media (min-width: 641px) {
+  .modal-fade-enter-from .relative {
+    transform: scale(0.95) translateY(-20px);
+    opacity: 0;
+  }
+
+  .modal-fade-leave-to .relative {
+    transform: scale(0.95) translateY(20px);
+    opacity: 0;
+  }
 }
 </style>
