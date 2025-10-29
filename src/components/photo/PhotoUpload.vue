@@ -1,104 +1,110 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import ErrorMessage from '@/components/common/ErrorMessage.vue'
+import PhotoPreview from '@/components/photo/PhotoPreview.vue'
+import { usePhotoUpload } from '@/composables/usePhotoUpload'
 
 const emit = defineEmits<{
-  upload: [photo: File | null]
+  upload: [file: File | null]
 }>()
 
 const fileInput = ref<HTMLInputElement | null>(null)
-const uploadedFile = ref<File | null>(null)
-const previewUrl = ref<string>('')
-const error = ref<string>('')
+const dropActive = ref(false)
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png']
+const {
+  previewUrl,
+  dataUrl,
+  loading,
+  error,
+  handleInputFile,
+  remove,
+  getProcessedFile,
+} = usePhotoUpload()
 
-const handleFileSelect = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
+const triggerUpload = () => fileInput.value?.click()
 
-  if (!file) return
-
-  error.value = ''
-
-  // Validate file type
-  if (!ALLOWED_TYPES.includes(file.type)) {
-    error.value = 'Please upload a JPG or PNG image'
-    return
+const onFileChange = async (e: Event) => {
+  const target = e.target as HTMLInputElement
+  const file = target.files?.[0] ?? null
+  const result = await handleInputFile(file ?? null)
+  // emit processed file if available
+  if (result && result.blob) {
+    // convert to File before emitting
+    const processedFile = getProcessedFile(file?.name ?? 'photo.jpg')
+    emit('upload', processedFile)
+  } else if (!file) {
+    emit('upload', null)
+  } else {
+    emit('upload', null)
   }
-
-  // Validate file size
-  if (file.size > MAX_FILE_SIZE) {
-    error.value = 'File size must be less than 5MB'
-    return
-  }
-
-  uploadedFile.value = file
-  previewUrl.value = URL.createObjectURL(file)
-  emit('upload', file)
 }
 
-const handleRemove = () => {
-  uploadedFile.value = null
-  previewUrl.value = ''
-  error.value = ''
-  if (fileInput.value) {
-    fileInput.value.value = ''
-  }
+const onRemove = () => {
+  remove()
+  if (fileInput.value) fileInput.value.value = ''
   emit('upload', null)
 }
 
-const triggerUpload = () => {
-  fileInput.value?.click()
+// Drag & drop handlers
+const onDragOver = (e: DragEvent) => {
+  e.preventDefault()
+  dropActive.value = true
 }
-
-const hasPhoto = computed(() => !!uploadedFile.value)
+const onDragLeave = (e: DragEvent) => {
+  e.preventDefault()
+  dropActive.value = false
+}
+const onDrop = async (e: DragEvent) => {
+  e.preventDefault()
+  dropActive.value = false
+  const file = e.dataTransfer?.files?.[0] ?? null
+  const result = await handleInputFile(file ?? null)
+  if (result && result.blob) {
+    const processedFile = getProcessedFile(file?.name ?? 'photo.jpg')
+    emit('upload', processedFile)
+  } else {
+    emit('upload', null)
+  }
+}
 </script>
 
 <template>
-  <div class="space-y-4">
+  <div class="space-y-3">
     <input
       ref="fileInput"
       type="file"
-      accept="image/jpeg,image/jpg,image/png"
+      accept="image/jpeg,image/jpg,image/png,image/webp"
       class="hidden"
-      @change="handleFileSelect"
+      @change="onFileChange"
     />
 
-    <div v-if="!hasPhoto" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
-      <p class="mt-2 text-sm text-gray-600">Click to upload a photo</p>
-      <p class="text-xs text-gray-500 mt-1">JPG or PNG (max 5MB)</p>
-      <BaseButton @click="triggerUpload" class="mt-4">
-        Choose Photo
-      </BaseButton>
-    </div>
-
-    <div v-else class="relative">
-      <img
-        :src="previewUrl"
-        alt="Uploaded photo"
-        class="w-full h-48 object-cover rounded-lg"
-      />
-      <button
-        type="button"
-        @click="handleRemove"
-        class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors"
-      >
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            fill-rule="evenodd"
-            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-            clip-rule="evenodd"
-          />
+    <div
+      @dragover.prevent="onDragOver"
+      @dragenter.prevent="onDragOver"
+      @dragleave.prevent="onDragLeave"
+      @drop.prevent="onDrop"
+      :class="['border-2 rounded-lg p-6 text-center transition-colors', dropActive ? 'border-blue-400 bg-blue-50' : 'border-gray-300 bg-white']"
+    >
+      <div v-if="!previewUrl">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
-      </button>
+        <p class="mt-2 text-sm text-gray-600">Drag & drop a photo, or click to browse</p>
+        <p class="text-xs text-gray-500 mt-1">JPG, PNG, WebP (max 5MB)</p>
+        <BaseButton @click.prevent="triggerUpload" class="mt-4">Choose Photo</BaseButton>
+      </div>
+
+      <div v-else>
+        <PhotoPreview :src="dataUrl || previewUrl" :loading="loading" @remove="onRemove" />
+      </div>
     </div>
 
-    <ErrorMessage v-if="error" :message="error" />
+    <div class="flex items-center space-x-2">
+      <div v-if="loading" class="text-sm text-gray-600">Processing image...</div>
+      <div v-if="error" class="ml-auto">
+        <ErrorMessage :message="error" />
+      </div>
+    </div>
   </div>
 </template>
