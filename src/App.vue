@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import GreetingCard from '@/components/card/GreetingCard.vue'
-import HolidaySelector from '@/components/templates/HolidaySelector.vue'
-import PhotoUpload from '@/components/photo/PhotoUpload.vue'
-import CardForm from '@/components/greeting-card/CardForm.vue'
-import BaseButton from '@/components/common/BaseButton.vue'
-import ExportModal from '@/components/modal/ExportModal.vue'
-import PreviewModal from '@/components/modal/PreviewModal.vue'
+import { ref, computed, defineAsyncComponent } from 'vue'
 import { useGreetingCard } from '@/composables/useGreetingCard'
 import { useModal } from '@/composables/useModal'
 import type { HolidayTemplate } from '@/types/template'
+
+// Eagerly loaded components (above the fold)
+import HolidaySelector from '@/components/templates/HolidaySelector.vue'
+import BaseButton from '@/components/common/BaseButton.vue'
+
+// Lazy loaded components (below the fold or conditional)
+const GreetingCard = defineAsyncComponent(() => import('@/components/card/GreetingCard.vue'))
+const PhotoUpload = defineAsyncComponent(() => import('@/components/photo/PhotoUpload.vue'))
+const CardForm = defineAsyncComponent(() => import('@/components/greeting-card/CardForm.vue'))
+const ExportModal = defineAsyncComponent(() => import('@/components/modal/ExportModal.vue'))
+const PreviewModal = defineAsyncComponent(() => import('@/components/modal/PreviewModal.vue'))
 
 // State management
 const selectedTemplate = ref<string>('christmas')
