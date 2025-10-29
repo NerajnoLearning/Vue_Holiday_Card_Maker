@@ -30,44 +30,33 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Manual chunk splitting
-        manualChunks: {
+        manualChunks: (id) => {
           // Vue core
-          'vue-vendor': ['vue'],
-
+          if (id.includes('node_modules/vue')) {
+            return 'vue-vendor';
+          }
           // PDF/Image export libraries (heavy dependencies)
-          'export-libs': ['jspdf', 'html2canvas'],
-
+          if (id.includes('node_modules/jspdf') || id.includes('node_modules/html2canvas')) {
+            return 'export-libs';
+          }
           // DOMPurify
-          'sanitize': ['dompurify'],
-
+          if (id.includes('node_modules/dompurify')) {
+            return 'sanitize';
+          }
           // Components - group by feature
-          'components-common': [
-            './src/components/common/BaseButton.vue',
-            './src/components/common/BaseInput.vue',
-            './src/components/common/BaseModal.vue',
-            './src/components/common/LoadingSpinner.vue',
-            './src/components/common/ErrorMessage.vue',
-          ],
-
-          'components-card': [
-            './src/components/card/GreetingCard.vue',
-            './src/components/greeting-card/CardForm.vue',
-            './src/components/greeting-card/CardPreview.vue',
-          ],
-
-          'components-modal': [
-            './src/components/modal/ExportModal.vue',
-            './src/components/modal/PreviewModal.vue',
-          ],
-
-          // Customization components (loaded on demand)
-          'components-customization': [
-            './src/components/customization/ColorPicker.vue',
-            './src/components/customization/FontSelector.vue',
-            './src/components/customization/LayoutControls.vue',
-            './src/components/customization/SavedTemplates.vue',
-            './src/components/customization/ShareTemplate.vue',
-          ],
+          if (id.includes('/src/components/common/')) {
+            return 'components-common';
+          }
+          if (id.includes('/src/components/card/') || id.includes('/src/components/greeting-card/')) {
+            return 'components-card';
+          }
+          if (id.includes('/src/components/modal/')) {
+            return 'components-modal';
+          }
+          if (id.includes('/src/components/customization/')) {
+            return 'components-customization';
+          }
+          // Default: let Vite handle other chunks
         },
 
         // Asset file naming
