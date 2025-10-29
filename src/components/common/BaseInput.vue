@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useReducedMotion } from '@/composables/useReducedMotion'
 
 interface Props {
   modelValue?: string | number
@@ -24,6 +25,8 @@ const emit = defineEmits<{
   blur: []
 }>()
 
+const { prefersReducedMotion } = useReducedMotion()
+
 const handleInput = (event: Event) => {
   const target = event.target as HTMLInputElement
   emit('update:modelValue', target.value)
@@ -34,13 +37,18 @@ const handleBlur = () => {
 }
 
 const inputClasses = computed(() => {
+  const animations = prefersReducedMotion.value
+    ? 'transition-none'
+    : 'transition-all duration-200 ease-in-out hover:border-gray-400'
+
   return [
-    'w-full px-3 py-2 sm:px-4 sm:py-2.5 border rounded-lg shadow-sm transition-all duration-200',
+    'w-full px-3 py-2 sm:px-4 sm:py-2.5 border rounded-lg shadow-sm',
     'text-sm sm:text-base',
-    'focus:outline-none focus:ring-2',
+    'focus:outline-none focus:ring-2 focus:shadow-md',
     'touch-manipulation',
+    animations,
     props.error
-      ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+      ? 'border-red-300 focus:border-red-500 focus:ring-red-500 hover:border-red-400'
       : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500',
     props.disabled
       ? 'bg-gray-100 cursor-not-allowed opacity-50'
