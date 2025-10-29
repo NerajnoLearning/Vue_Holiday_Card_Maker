@@ -18,7 +18,9 @@ export const useA11y = () => {
     document.body.appendChild(announcement)
 
     setTimeout(() => {
-      document.body.removeChild(announcement)
+      if (document.body.contains(announcement)) {
+        document.body.removeChild(announcement)
+      }
     }, 1000)
   }
 
