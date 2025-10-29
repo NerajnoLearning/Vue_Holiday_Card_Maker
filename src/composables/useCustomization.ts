@@ -69,7 +69,7 @@ export const useCustomization = () => {
     try {
       const savedTemplate: SavedTemplate = {
         ...customization,
-        id: `custom-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `custom-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
         name,
         preview,
         isPublic,
