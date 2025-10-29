@@ -210,7 +210,7 @@ defineExpose({
         v-model="localGreeting"
         :disabled="props.disabled"
         :maxlength="MAX_GREETING_LENGTH"
-        :rows="6"
+        rows="6"
         placeholder="Write your heartfelt greeting message here..."
         class="w-full px-3 py-2 sm:px-4 sm:py-3 border rounded-lg shadow-sm transition-all duration-200 resize-none focus:outline-none focus:ring-2 text-sm sm:text-base touch-manipulation"
         :class="{
