@@ -5,6 +5,7 @@ export interface JPGOptions {
   quality?: number
   scale?: number
   backgroundColor?: string
+  includeTimestamp?: boolean
 }
 
 export interface JPGResult {
@@ -12,6 +13,35 @@ export interface JPGResult {
   filename?: string
   dataUrl?: string
   error?: string
+}
+
+/**
+ * Generate a timestamp string for filenames
+ * Format: YYYYMMDD_HHMMSS
+ */
+const generateTimestamp = (): string => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  const hours = String(now.getHours()).padStart(2, '0')
+  const minutes = String(now.getMinutes()).padStart(2, '0')
+  const seconds = String(now.getSeconds()).padStart(2, '0')
+  return `${year}${month}${day}_${hours}${minutes}${seconds}`
+}
+
+/**
+ * Add timestamp to filename before extension
+ */
+const addTimestampToFilename = (filename: string): string => {
+  const timestamp = generateTimestamp()
+  const lastDotIndex = filename.lastIndexOf('.')
+  if (lastDotIndex === -1) {
+    return `${filename}_${timestamp}`
+  }
+  const nameWithoutExt = filename.substring(0, lastDotIndex)
+  const ext = filename.substring(lastDotIndex)
+  return `${nameWithoutExt}_${timestamp}${ext}`
 }
 
 /**
@@ -28,8 +58,12 @@ export const generateJPG = async (
     filename = 'greeting-card.jpg',
     quality = 0.92,
     scale = 2,
-    backgroundColor = '#ffffff'
+    backgroundColor = '#ffffff',
+    includeTimestamp = true
   } = options
+
+  // Add timestamp to filename if requested
+  const finalFilename = includeTimestamp ? addTimestampToFilename(filename) : filename
 
   try {
     // Convert HTML element to canvas with high quality
@@ -48,14 +82,14 @@ export const generateJPG = async (
     // Create download link and trigger download
     const link = document.createElement('a')
     link.href = dataUrl
-    link.download = filename
+    link.download = finalFilename
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
 
     return {
       success: true,
-      filename,
+      filename: finalFilename,
       dataUrl
     }
   } catch (error) {
