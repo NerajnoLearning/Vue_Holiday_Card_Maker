@@ -111,9 +111,10 @@ const handleNameBlur = () => {
 
 const handleGreetingBlur = () => {
   const sanitized = sanitizeInput(localGreeting.value)
-  // Always update even if unchanged to ensure parent has sanitized value
-  localGreeting.value = sanitized
-  emit('update:greeting', sanitized)
+  if (sanitized !== localGreeting.value) {
+    localGreeting.value = sanitized
+    emit('update:greeting', sanitized)
+  }
 }
 
 // Clear form
