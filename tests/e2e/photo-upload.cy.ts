@@ -81,11 +81,6 @@ describe('Photo Upload Flow', () => {
   })
 
   it('should support drag and drop upload', () => {
-    const dropEvent = {
-      dataTransfer: {
-        files: [],
-      },
-    }
 
     cy.get('[data-testid="photo-upload"]')
       .trigger('dragover')
