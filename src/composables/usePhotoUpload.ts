@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { validateImageFile, MAX_IMAGE_FILE_SIZE, ALLOWED_IMAGE_TYPES } from '@/utils/image/image-validator'
-import resizeImage, { blobToFile } from '@/utils/image/image-resizer'
+import resizeImage, { blobToFile, type ResizeProgress } from '@/utils/image/image-resizer'
 
 export const usePhotoUpload = () => {
   const originalFile = ref<File | null>(null)
@@ -20,7 +20,7 @@ export const usePhotoUpload = () => {
     error.value = null
   }
 
-  const processFile = async (file: File) => {
+  const processFile = async (file: File, onProgress?: (progress: ResizeProgress) => void) => {
     error.value = null
     const validation = validateImageFile(file, { maxSize: MAX_IMAGE_FILE_SIZE, allowedTypes: ALLOWED_IMAGE_TYPES })
     if (!validation.valid) {
@@ -34,8 +34,8 @@ export const usePhotoUpload = () => {
 
     try {
       loading.value = true
-      // Resize/compress
-      const result = await resizeImage(file, { maxWidth: 1200, maxHeight: 1200, quality: 0.9 })
+      // Resize/compress with progress tracking
+      const result = await resizeImage(file, { maxWidth: 1200, maxHeight: 1200, quality: 0.9 }, onProgress)
       processedBlob.value = result.blob
       dataUrl.value = result.dataUrl
       return { blob: result.blob, dataUrl: result.dataUrl }
@@ -49,9 +49,12 @@ export const usePhotoUpload = () => {
     }
   }
 
-  const handleInputFile = async (file?: File | null) => {
-    if (!file) return reset()
-    return await processFile(file)
+  const handleInputFile = async (file?: File | null, onProgress?: (progress: ResizeProgress) => void) => {
+    if (!file) {
+      reset()
+      return null
+    }
+    return await processFile(file, onProgress)
   }
 
   const remove = () => {
