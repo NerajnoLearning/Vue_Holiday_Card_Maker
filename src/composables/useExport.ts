@@ -126,17 +126,19 @@ export const useExport = () => {
       }
 
       // Use retry logic if enabled
-      const result = retry
-        ? await retryAsync(exportFn, {
-            maxAttempts: maxRetries,
-            delay: 1000,
-            backoff: true,
-            onRetry: (attempt) => {
-              retryCount.value = attempt
-              progress.value = 30 + (attempt * 10)
-            }
-          })
-        : await exportFn()
+      if (retry) {
+        await retryAsync(exportFn, {
+          maxAttempts: maxRetries,
+          delay: 1000,
+          backoff: true,
+          onRetry: (attempt) => {
+            retryCount.value = attempt
+            progress.value = 30 + (attempt * 10)
+          }
+        });
+      } else {
+        await exportFn();
+      }
 
       progress.value = 100
 
