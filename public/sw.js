@@ -82,7 +82,12 @@ self.addEventListener('fetch', (event) => {
       caches.match(request)
         .then(cachedResponse => {
           if (cachedResponse) {
-            console.log('[SW] Serving from cache:', request.url)
+            if (
+              location.hostname === 'localhost' ||
+              location.hostname === '127.0.0.1'
+            ) {
+              console.log('[SW] Serving from cache:', request.url)
+            }
             return cachedResponse
           }
 
