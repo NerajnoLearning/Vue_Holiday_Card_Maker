@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { useToast, type Toast } from '@/composables/useToast'
-import { computed } from 'vue'
-
 const { toasts, remove } = useToast()
 
 const getToastIcon = (type: Toast['type']) => {
