@@ -41,8 +41,8 @@ const handleClose = () => {
 }
 
 const handleExport = async () => {
-  // Get the card element from the ref
-  const element = cardElement.value?.querySelector('.greeting-card') as HTMLElement
+  // Use the cardElement ref directly
+  const element = cardElement.value as HTMLElement
 
   if (!element) {
     console.error('Card element not found')
