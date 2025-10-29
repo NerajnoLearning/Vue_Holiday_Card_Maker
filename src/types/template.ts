@@ -3,7 +3,7 @@ export interface HolidayTemplate {
   name: string;
   background: string;
   thumbnail: string;
-  defaultMessage: string;
+  defaultGreeting: string;
   colors: {
     primary: string;
     secondary: string;
