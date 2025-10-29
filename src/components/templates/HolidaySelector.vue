@@ -24,12 +24,35 @@ const handleSelect = (templateId: string) => {
 
 <template>
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <TemplateCard
-      v-for="template in templates"
-      :key="template.id"
-      :template="template"
-      :selected="selectedTemplate === template.id"
-      @click="handleSelect(template.id)"
-    />
+    <TransitionGroup
+      name="template-fade"
+      tag="div"
+      class="contents"
+    >
+      <TemplateCard
+        v-for="template in templates"
+        :key="template.id"
+        :template="template"
+        :selected="selectedTemplate === template.id"
+        @click="handleSelect(template.id)"
+      />
+    </TransitionGroup>
   </div>
 </template>
+
+<style scoped>
+.template-fade-enter-active,
+.template-fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.template-fade-enter-from {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.template-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+</style>
