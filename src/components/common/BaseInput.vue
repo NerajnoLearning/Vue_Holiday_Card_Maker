@@ -47,12 +47,13 @@ const inputClasses = computed(() => {
     'focus:outline-none focus:ring-2 focus:shadow-md',
     'touch-manipulation',
     'transition-all duration-200 ease-in-out hover:border-gray-400',
+    'dark:text-dark-text-primary dark:placeholder-dark-text-muted',
     props.error
-      ? 'border-red-300 focus:border-red-500 focus:ring-red-500 hover:border-red-400'
-      : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500',
+      ? 'border-red-300 focus:border-red-500 focus:ring-red-500 hover:border-red-400 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400'
+      : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:border-dark-border dark:focus:border-blue-400 dark:focus:ring-blue-400',
     props.disabled
-      ? 'bg-gray-100 cursor-not-allowed opacity-50'
-      : 'bg-white'
+      ? 'bg-gray-100 cursor-not-allowed opacity-50 dark:bg-gray-800'
+      : 'bg-white dark:bg-dark-surface'
   ].join(' ')
 })
 </script>
