@@ -127,10 +127,12 @@ const clearForm = () => {
 
 // Reset to initial values
 const resetForm = () => {
-  localName.value = props.name
-  localGreeting.value = props.greeting
-  emit('update:name', props.name)
-  emit('update:greeting', props.greeting)
+  const sanitizedName = sanitizeInput(props.name)
+  const sanitizedGreeting = sanitizeInput(props.greeting)
+  localName.value = sanitizedName
+  localGreeting.value = sanitizedGreeting
+  emit('update:name', sanitizedName)
+  emit('update:greeting', sanitizedGreeting)
   emit('reset')
 }
 
