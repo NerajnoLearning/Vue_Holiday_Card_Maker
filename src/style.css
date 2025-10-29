@@ -126,4 +126,78 @@
       transition: none;
     }
   }
+
+  /* Screen reader only content */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Skip to main content link */
+  .skip-link {
+    @apply absolute top-0 left-0 bg-blue-600 text-white px-4 py-2 rounded-br-lg;
+    @apply transform -translate-y-full;
+    @apply focus:translate-y-0;
+    @apply transition-transform;
+    z-index: 9999;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  * {
+    border-color: currentColor !important;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    border-width: 2px !important;
+  }
+
+  button:focus,
+  a:focus,
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: 3px solid currentColor !important;
+    outline-offset: 2px !important;
+  }
+
+  .bg-blue-600,
+  .bg-gray-600,
+  .bg-red-600 {
+    background-color: ButtonFace !important;
+    color: ButtonText !important;
+  }
+
+  .text-gray-600,
+  .text-gray-700,
+  .text-gray-800 {
+    color: CanvasText !important;
+  }
+}
+
+/* Focus Visible (Better than default focus) */
+*:focus-visible {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* Skip default focus */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Ensure sufficient color contrast */
+@media (prefers-color-scheme: dark) {
+  /* Future dark mode support */
 }

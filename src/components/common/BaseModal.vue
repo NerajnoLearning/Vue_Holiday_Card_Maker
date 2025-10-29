@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
+import { useId } from '@/composables/useA11y'
 
 interface Props {
   modelValue?: boolean
   maxWidth?: string
   closeOnEscape?: boolean
   closeOnClickOutside?: boolean
+  title?: string
+  description?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -19,6 +22,10 @@ const emit = defineEmits<{
   'update:modelValue': [value: boolean]
   close: []
 }>()
+
+// Generate unique IDs for ARIA
+const titleId = useId('modal-title')
+const descId = useId('modal-desc')
 
 const modalContent = ref<HTMLElement | null>(null)
 
@@ -138,8 +145,19 @@ const maxWidthClass = {
           ]"
           role="dialog"
           aria-modal="true"
+          :aria-labelledby="props.title ? titleId : undefined"
+          :aria-describedby="props.description ? descId : undefined"
           @click.stop
         >
+          <!-- Hidden title for screen readers if provided -->
+          <h2 v-if="props.title" :id="titleId" class="sr-only">
+            {{ props.title }}
+          </h2>
+          <!-- Hidden description for screen readers if provided -->
+          <p v-if="props.description" :id="descId" class="sr-only">
+            {{ props.description }}
+          </p>
+
           <slot />
         </div>
       </div>
