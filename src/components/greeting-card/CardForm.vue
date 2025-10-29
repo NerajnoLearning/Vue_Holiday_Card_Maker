@@ -245,6 +245,11 @@ defineExpose({
     </div>
 
     <!-- Form Actions -->
+    <!-- ARIA live region for form actions announcement -->
+    <div class="sr-only" role="status" aria-live="polite">
+      <span v-if="isDirty">Form actions are now available</span>
+      <span v-else>Form actions are no longer available</span>
+    </div>
     <Transition name="form-actions">
       <div
         v-if="isDirty"
