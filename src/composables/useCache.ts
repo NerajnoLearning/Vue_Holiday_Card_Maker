@@ -117,7 +117,7 @@ export const useCache = (config: CacheConfig = {}) => {
           entry = JSON.parse(item) as CacheEntry<T>
         }
       } else {
-        entry = memoryCache.get(cacheKey) as CacheEntry<T> | undefined || null
+        entry = (memoryCache.get(cacheKey) as CacheEntry<T> | undefined) ?? null
       }
 
       if (!entry) return null
