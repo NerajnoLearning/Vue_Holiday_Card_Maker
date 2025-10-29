@@ -16,7 +16,6 @@ describe('Photo Upload Flow', () => {
   })
 
   it('should accept valid image file types', () => {
-    const acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
     cy.get('input[type="file"]')
       .invoke('attr', 'accept')
       .should('exist')
