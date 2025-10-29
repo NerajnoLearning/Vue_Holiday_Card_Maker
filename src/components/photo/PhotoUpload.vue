@@ -4,6 +4,7 @@ import BaseButton from '@/components/common/BaseButton.vue'
 import ErrorMessage from '@/components/common/ErrorMessage.vue'
 import PhotoPreview from '@/components/photo/PhotoPreview.vue'
 import { usePhotoUpload } from '@/composables/usePhotoUpload'
+import type { ResizeProgress } from '@/utils/image/image-resizer'
 
 const emit = defineEmits<{
   upload: [file: File | null]
@@ -11,6 +12,7 @@ const emit = defineEmits<{
 
 const fileInput = ref<HTMLInputElement | null>(null)
 const dropActive = ref(false)
+const progress = ref<ResizeProgress | null>(null)
 
 const {
   previewUrl,
@@ -27,7 +29,10 @@ const triggerUpload = () => fileInput.value?.click()
 const onFileChange = async (e: Event) => {
   const target = e.target as HTMLInputElement
   const file = target.files?.[0] ?? null
-  const result = await handleInputFile(file ?? null)
+  progress.value = null
+  const result = await handleInputFile(file ?? null, (p) => {
+    progress.value = p
+  })
   // emit processed file if available
   if (result && result.blob) {
     // convert to File before emitting
@@ -38,6 +43,7 @@ const onFileChange = async (e: Event) => {
   } else {
     emit('upload', null)
   }
+  progress.value = null
 }
 
 const onRemove = () => {
@@ -59,13 +65,17 @@ const onDrop = async (e: DragEvent) => {
   e.preventDefault()
   dropActive.value = false
   const file = e.dataTransfer?.files?.[0] ?? null
-  const result = await handleInputFile(file ?? null)
+  progress.value = null
+  const result = await handleInputFile(file ?? null, (p) => {
+    progress.value = p
+  })
   if (result && result.blob) {
     const processedFile = getProcessedFile(file?.name ?? 'photo.jpg')
     emit('upload', processedFile)
   } else {
     emit('upload', null)
   }
+  progress.value = null
 }
 </script>
 
@@ -100,11 +110,23 @@ const onDrop = async (e: DragEvent) => {
       </div>
     </div>
 
-    <div class="flex items-center space-x-2">
-      <div v-if="loading" class="text-sm text-gray-600">Processing image...</div>
-      <div v-if="error" class="ml-auto">
-        <ErrorMessage :message="error" />
+    <!-- Progress indicator -->
+    <div v-if="loading && progress" class="space-y-2">
+      <div class="flex items-center justify-between text-sm">
+        <span class="text-gray-600">{{ progress.message }}</span>
+        <span class="text-gray-500">{{ progress.progress }}%</span>
       </div>
+      <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+        <div
+          class="bg-blue-600 h-2 transition-all duration-300 ease-out"
+          :style="{ width: `${progress.progress}%` }"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Error message -->
+    <div v-if="error">
+      <ErrorMessage :message="error" />
     </div>
   </div>
 </template>

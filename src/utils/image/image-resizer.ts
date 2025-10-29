@@ -7,71 +7,201 @@
  */
 
 export interface ResizeOptions {
-	maxWidth?: number;
-	maxHeight?: number;
-	quality?: number; // 0..1 for JPEG
-	mimeType?: string; // output mime type
+  maxWidth?: number
+  maxHeight?: number
+  quality?: number
+  mimeType?: string
+}
+
+export interface ResizeProgress {
+  stage: 'loading' | 'processing' | 'compressing' | 'done'
+  progress: number
+  message: string
 }
 
 export interface ResizeResult {
-	blob: Blob;
-	dataUrl: string;
-	width: number;
-	height: number;
+  blob: Blob
+  dataUrl: string
+  url: string
+  width: number
+  height: number
+  size: number
+  type: string
+  originalSize: number
+  savedBytes: number
+}
+
+function calculateAspectRatio(
+  originalWidth: number,
+  originalHeight: number,
+  maxWidth: number,
+  maxHeight: number
+): { width: number; height: number } {
+  let width = originalWidth
+  let height = originalHeight
+
+  // Calculate the aspect ratio
+  const aspectRatio = width / height
+
+  // Calculate new dimensions while maintaining aspect ratio
+  if (width > maxWidth) {
+    width = maxWidth
+    height = width / aspectRatio
+  }
+
+  if (height > maxHeight) {
+    height = maxHeight
+    width = height * aspectRatio
+  }
+
+  // Ensure dimensions are integers
+  return {
+    width: Math.round(width),
+    height: Math.round(height)
+  }
 }
 
 function loadImageFromFile(file: File): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file)
+    const img = new Image()
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      resolve(img)
+    }
+    img.onerror = (e) => {
+      URL.revokeObjectURL(url)
+      reject(new Error('Failed to load image'))
+    }
+    img.src = url
+  })
+}
+
+// Compression levels for different image types
+const COMPRESSION_LEVELS = {
+	'image/jpeg': 0.8, // Higher quality for JPEG
+	'image/jpg': 0.8, // Higher quality for JPG
+	'image/png': 0.9, // Slightly lower quality for PNG
+	'image/webp': 0.8, // Good quality for WebP
+} as const;
+
+export const resizeImage = (
+	file: File,
+	options: ResizeOptions,
+	onProgress?: (progress: ResizeProgress) => void
+): Promise<ResizeResult> => {
 	return new Promise((resolve, reject) => {
-		const url = URL.createObjectURL(file)
-		const img = new Image()
-		img.onload = () => {
-			URL.revokeObjectURL(url)
-			resolve(img)
-		}
-		img.onerror = (e) => {
-			URL.revokeObjectURL(url)
-			reject(new Error('Failed to load image'))
-		}
-		img.src = url
-	})
-}
+		const reader = new FileReader();
 
-export async function resizeImage(file: File, opts: ResizeOptions = {}): Promise<ResizeResult> {
-	const { maxWidth = 1200, maxHeight = 1200, quality = 0.9, mimeType = 'image/jpeg' } = opts
+		const updateProgress = (stage: ResizeProgress['stage'], progress: number, message: string) => {
+			onProgress?.({
+				stage,
+				progress: Math.min(100, Math.max(0, progress)),
+				message,
+			});
+		};
 
-	const img = await loadImageFromFile(file)
+		updateProgress('loading', 10, 'Reading file...');
 
-	const ratio = Math.min(maxWidth / img.naturalWidth, maxHeight / img.naturalHeight, 1)
-	const targetWidth = Math.round(img.naturalWidth * ratio)
-	const targetHeight = Math.round(img.naturalHeight * ratio)
+		reader.onload = (event) => {
+			const img = new Image();
+			img.onload = () => {
+				updateProgress('processing', 30, 'Processing image...');
 
-	const canvas = document.createElement('canvas')
-	canvas.width = targetWidth
-	canvas.height = targetHeight
-	const ctx = canvas.getContext('2d')
-	if (!ctx) throw new Error('Could not get canvas context')
+				const canvas = document.createElement('canvas');
+				const ctx = canvas.getContext('2d');
 
-	// Draw with smoothing for better quality
-	ctx.imageSmoothingEnabled = true
-	ctx.imageSmoothingQuality = 'high'
-	ctx.drawImage(img, 0, 0, targetWidth, targetHeight)
-
-	return new Promise<ResizeResult>((resolve, reject) => {
-		canvas.toBlob(
-			(blob) => {
-				if (!blob) return reject(new Error('Failed to create blob from canvas'))
-				const reader = new FileReader()
-				reader.onloadend = () => {
-					resolve({ blob, dataUrl: reader.result as string, width: targetWidth, height: targetHeight })
+				if (!ctx) {
+					return reject(new Error('Could not get canvas context'));
 				}
-				reader.onerror = () => reject(new Error('Failed to read blob'))
-				reader.readAsDataURL(blob)
-			},
-			mimeType,
-			quality
-		)
-	})
-}
+
+				// Calculate new dimensions
+				let { width, height } = calculateAspectRatio(
+					img.width,
+					img.height,
+					options.maxWidth || img.width,
+					options.maxHeight || img.height
+				);
+
+				// Set canvas dimensions
+				canvas.width = width;
+				canvas.height = height;
+
+				// Apply image smoothing for better quality
+				ctx.imageSmoothingEnabled = true;
+				ctx.imageSmoothingQuality = 'high';
+
+				// Draw image with new dimensions
+				ctx.drawImage(img, 0, 0, width, height);
+
+				// Determine best quality based on file type
+				const fileType = file.type as keyof typeof COMPRESSION_LEVELS;
+				const quality = options.quality ?? COMPRESSION_LEVELS[fileType] ?? 0.8;
+
+				updateProgress('compressing', 70, 'Optimizing image...');
+
+				// Convert to blob with specified quality
+				canvas.toBlob(
+					(blob) => {
+						if (!blob) {
+							return reject(new Error('Failed to create image blob'));
+						}
+
+						// Create WebP version if original is a different format and browser supports it
+						const shouldConvertToWebP = file.type !== 'image/webp' &&
+							canvas.toDataURL('image/webp').startsWith('data:image/webp');
+
+						const processBlob = (finalBlob: Blob, type: string) => {
+							const url = URL.createObjectURL(finalBlob);
+							const reader = new FileReader();
+
+							reader.onload = () => {
+								updateProgress('done', 100, 'Done!');
+
+								resolve({
+									blob: finalBlob,
+									url,
+									dataUrl: reader.result as string,
+									width,
+									height,
+									size: finalBlob.size,
+									type: finalBlob.type,
+									originalSize: file.size,
+									savedBytes: file.size - finalBlob.size,
+								});
+							};
+
+							reader.onerror = () => reject(new Error('Failed to read processed file'));
+							reader.readAsDataURL(finalBlob);
+						};
+
+						if (shouldConvertToWebP) {
+							// Convert to WebP for better compression
+							canvas.toBlob(
+								(webpBlob) => {
+									if (!webpBlob) return processBlob(blob, blob.type);
+									processBlob(webpBlob, 'image/webp');
+								},
+								'image/webp',
+								quality
+							);
+						} else {
+							processBlob(blob, blob.type);
+						}
+					},
+					file.type,
+					quality
+				);
+			};
+
+			img.onerror = () => reject(new Error('Failed to load image'));
+			img.src = event.target?.result as string;
+		};
+
+		reader.onerror = () => reject(new Error('Failed to read file'));
+		reader.readAsDataURL(file);
+	});
+};
 
 // Helper to convert blob to File (if upstream expects File)
 export function blobToFile(blob: Blob, fileName: string): File {

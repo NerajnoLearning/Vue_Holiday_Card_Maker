@@ -1,11 +1,34 @@
+<script setup lang="ts">
+interface Props {
+  src: string
+  alt?: string
+  loading?: boolean
+}
+
+const props = defineProps<Props>()
+const emit = defineEmits<{
+  remove: []
+}>()
+
+const emitRemove = () => emit('remove')
+</script>
+
 <template>
   <div class="relative w-full">
-    <img :src="src" :alt="alt" class="w-full h-48 object-cover rounded-lg" />
+    <!-- Image -->
+    <img
+      :src="props.src"
+      :alt="props.alt || 'Photo preview'"
+      class="w-full h-48 object-cover rounded-lg"
+      :class="{ 'opacity-50': props.loading }"
+    />
 
+    <!-- Remove button -->
     <button
+      v-if="!props.loading"
       type="button"
       @click="emitRemove"
-      class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors"
+      class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
       aria-label="Remove photo"
     >
       <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -17,19 +40,13 @@
       </svg>
     </button>
 
-    <div v-if="loading" class="absolute inset-0 bg-black/40 flex items-center justify-center rounded-lg">
-      <div class="text-white text-sm">Processing...</div>
+    <!-- Loading overlay -->
+    <div
+      v-if="props.loading"
+      class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center rounded-lg"
+    >
+      <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white mb-2"></div>
+      <div class="text-white text-sm font-medium">Processing...</div>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
-
-const props = defineProps<{ src: string; alt?: string; loading?: boolean }>()
-// typed emits
-const emit = defineEmits<{ (e: 'remove'): void }>()
-const emitRemove = () => emit('remove')
-
-const { src, alt = 'Preview', loading = false } = props
-</script>
