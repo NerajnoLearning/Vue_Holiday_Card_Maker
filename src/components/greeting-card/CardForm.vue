@@ -104,18 +104,16 @@ const handleGreetingInput = (value: string) => {
 // Sanitize inputs on blur
 const handleNameBlur = () => {
   const sanitized = sanitizeInput(localName.value)
-  if (sanitized !== localName.value) {
-    localName.value = sanitized
-    emit('update:name', sanitized)
-  }
+  // Always update even if unchanged to ensure parent has sanitized value
+  localName.value = sanitized
+  emit('update:name', sanitized)
 }
 
 const handleGreetingBlur = () => {
   const sanitized = sanitizeInput(localGreeting.value)
-  if (sanitized !== localGreeting.value) {
-    localGreeting.value = sanitized
-    emit('update:greeting', sanitized)
-  }
+  // Always update even if unchanged to ensure parent has sanitized value
+  localGreeting.value = sanitized
+  emit('update:greeting', sanitized)
 }
 
 // Clear form
@@ -244,29 +242,44 @@ defineExpose({
     </div>
 
     <!-- Form Actions -->
-    <div v-if="isDirty" class="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
-      <button
-        type="button"
-        @click="resetForm"
-        :disabled="props.disabled"
-        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+    <Transition name="form-actions">
+      <div
+        v-if="isDirty"
+        class="flex items-center justify-end gap-3 pt-4 border-t border-gray-200"
+        role="region"
+        aria-label="Form actions"
       >
-        <svg class="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-        </svg>
-        Reset
-      </button>
-      <button
-        type="button"
-        @click="clearForm"
-        :disabled="props.disabled"
-        class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
-        <svg class="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-        </svg>
-        Clear All
-      </button>
+        <button
+          type="button"
+          @click="resetForm"
+          :disabled="props.disabled"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          aria-label="Reset form to initial values"
+        >
+          <svg class="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+          </svg>
+          Reset
+        </button>
+        <button
+          type="button"
+          @click="clearForm"
+          :disabled="props.disabled"
+          class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          aria-label="Clear all form fields"
+        >
+          <svg class="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          Clear All
+        </button>
+      </div>
+    </Transition>
+
+    <!-- Form Actions Announcements (for screen readers) -->
+    <div class="sr-only" role="status" aria-live="polite" aria-atomic="true">
+      <span v-if="isDirty">Form has been modified. Reset and Clear buttons are now available.</span>
+      <span v-else>Form is unchanged.</span>
     </div>
 
     <!-- Form Validation Status (hidden, for accessibility) -->
@@ -276,3 +289,21 @@ defineExpose({
     </div>
   </form>
 </template>
+
+<style scoped>
+/* Form actions transition */
+.form-actions-enter-active,
+.form-actions-leave-active {
+  transition: all 0.3s ease;
+}
+
+.form-actions-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.form-actions-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+</style>
