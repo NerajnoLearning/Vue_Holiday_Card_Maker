@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
 import GreetingCard from '@/components/card/GreetingCard.vue'
 import type { HolidayTemplate } from '@/types/template'
 
@@ -21,12 +21,25 @@ const emit = defineEmits<{
   export: []
 }>()
 
-// Generate photo URL from File if provided
-const photoUrl = computed(() => {
+// Store photo URL with proper cleanup
+const photoUrl = ref<string | null>(null)
+
+// Watch for photo changes and manage object URLs
+watchEffect((onCleanup) => {
   if (props.photo instanceof File) {
-    return URL.createObjectURL(props.photo)
+    // Create object URL for File
+    photoUrl.value = URL.createObjectURL(props.photo)
+
+    // Cleanup function to revoke object URL
+    onCleanup(() => {
+      if (photoUrl.value) {
+        URL.revokeObjectURL(photoUrl.value)
+      }
+    })
+  } else {
+    // No File, clear the URL
+    photoUrl.value = null
   }
-  return props.photo || null
 })
 
 // Check if card has enough content to preview
