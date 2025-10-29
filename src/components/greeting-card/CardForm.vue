@@ -135,7 +135,10 @@ const resetForm = () => {
 
 // Check if form is dirty (has changes)
 const isDirty = computed(() => {
-  return localName.value !== props.name || localGreeting.value !== props.greeting
+  return (
+    sanitizeInput(localName.value) !== sanitizeInput(props.name) ||
+    sanitizeInput(localGreeting.value) !== sanitizeInput(props.greeting)
+  )
 })
 
 // Expose validation state and methods for parent components
