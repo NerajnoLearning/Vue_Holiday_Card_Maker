@@ -206,7 +206,7 @@ export const useCustomization = () => {
       // Generate new ID and timestamps
       const imported: SavedTemplate = {
         ...parsed,
-        id: `imported-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `imported-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
         createdAt: new Date(),
         updatedAt: new Date(),
         shareCode: parsed.isPublic ? generateShareCode() : undefined
