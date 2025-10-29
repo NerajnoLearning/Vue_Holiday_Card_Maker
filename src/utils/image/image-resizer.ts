@@ -79,10 +79,10 @@ function loadImageFromFile(file: File): Promise<HTMLImageElement> {
 
 // Compression levels for different image types
 const COMPRESSION_LEVELS = {
-	'image/jpeg': 0.8, // Higher quality for JPEG
-	'image/jpg': 0.8, // Higher quality for JPG
-	'image/png': 0.9, // Slightly lower quality for PNG
-	'image/webp': 0.8, // Good quality for WebP
+	'image/jpeg': 0.8, // Standard quality for JPEG (lower than PNG)
+	'image/jpg': 0.8, // Standard quality for JPG (lower than PNG)
+	'image/png': 0.9, // Highest quality for PNG
+	'image/webp': 0.8, // Standard quality for WebP (lower than PNG)
 } as const;
 
 export const resizeImage = (
