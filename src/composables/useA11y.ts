@@ -147,22 +147,25 @@ export const useHighContrast = () => {
     }
   }
 
+  let query: MediaQueryList | null = null
+  let handler: (() => void) | null = null
+
   onMounted(() => {
     checkHighContrast()
 
     if (window.matchMedia) {
-      const query = window.matchMedia('(prefers-contrast: high)')
-      const handler = () => checkHighContrast()
+      query = window.matchMedia('(prefers-contrast: high)')
+      handler = () => checkHighContrast()
 
-      if (query.addEventListener) {
+      if (query.addEventListener && handler) {
         query.addEventListener('change', handler)
       }
+    }
+  })
 
-      onUnmounted(() => {
-        if (query.removeEventListener) {
-          query.removeEventListener('change', handler)
-        }
-      })
+  onUnmounted(() => {
+    if (query && query.removeEventListener && handler) {
+      query.removeEventListener('change', handler)
     }
   })
 
