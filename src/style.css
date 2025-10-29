@@ -1,3 +1,129 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@layer base {
+  /* Smooth scrolling for the entire page */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Disable animations for users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Card hover effect */
+  .card-hover {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .card-hover:hover {
+    @apply transform scale-105 shadow-xl;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card-hover:hover {
+      @apply transform-none scale-100;
+    }
+  }
+
+  /* Interactive element hover */
+  .interactive-hover {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  .interactive-hover:hover {
+    @apply brightness-110;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .interactive-hover {
+      @apply transition-none;
+    }
+  }
+
+  /* Fade in animation */
+  .fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fade-in {
+      animation: none;
+    }
+  }
+
+  /* Slide up animation */
+  .slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide-up {
+      animation: none;
+    }
+  }
+
+  /* Pulse animation for loading states */
+  .pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pulse-slow {
+      animation: none;
+      opacity: 0.7;
+    }
+  }
+}
+
+@layer utilities {
+  /* Utility class to disable animations */
+  .no-animation {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Smooth color transitions */
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .transition-smooth {
+      transition: none;
+    }
+  }
+}

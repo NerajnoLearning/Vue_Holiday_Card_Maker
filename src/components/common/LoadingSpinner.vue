@@ -39,25 +39,67 @@ const spinnerClasses = computed(() => {
 </script>
 
 <template>
-  <div
-    v-if="fullScreen"
-    class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm"
-    role="status"
-    aria-live="polite"
-    aria-label="Loading"
-  >
-    <div :class="spinnerClasses"></div>
-    <p v-if="message" class="mt-4 text-sm sm:text-base font-medium text-gray-700">
-      {{ message }}
-    </p>
-    <span class="sr-only">Loading...</span>
-  </div>
+  <Transition name="fade">
+    <div
+      v-if="fullScreen"
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm"
+      role="status"
+      aria-live="polite"
+      aria-label="Loading"
+    >
+      <div :class="spinnerClasses"></div>
+      <Transition name="slide-up">
+        <p v-if="message" class="mt-4 text-sm sm:text-base font-medium text-gray-700">
+          {{ message }}
+        </p>
+      </Transition>
+      <span class="sr-only">Loading...</span>
+    </div>
 
-  <div v-else class="flex flex-col items-center justify-center" role="status" aria-live="polite">
-    <div :class="spinnerClasses"></div>
-    <p v-if="message" class="mt-2 text-xs sm:text-sm text-gray-600">
-      {{ message }}
-    </p>
-    <span class="sr-only">Loading...</span>
-  </div>
+    <div v-else class="flex flex-col items-center justify-center" role="status" aria-live="polite">
+      <div :class="spinnerClasses"></div>
+      <Transition name="fade">
+        <p v-if="message" class="mt-2 text-xs sm:text-sm text-gray-600">
+          {{ message }}
+        </p>
+      </Transition>
+      <span class="sr-only">Loading...</span>
+    </div>
+  </Transition>
 </template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-enter-active,
+  .fade-leave-active,
+  .slide-up-enter-active,
+  .slide-up-leave-active {
+    transition: none;
+  }
+}
+</style>
