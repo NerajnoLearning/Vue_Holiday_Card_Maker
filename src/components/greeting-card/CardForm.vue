@@ -18,11 +18,27 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   'update:name': [value: string]
   'update:greeting': [value: string]
+  reset: []
 }>()
 
 // Local state
 const localName = ref(props.name)
 const localGreeting = ref(props.greeting)
+
+// Input sanitization
+const sanitizeInput = (value: string): string => {
+  // Remove leading/trailing whitespace
+  let sanitized = value.trim()
+
+  // Remove excessive whitespace (multiple spaces to single space)
+  sanitized = sanitized.replace(/\s+/g, ' ')
+
+  // Remove potentially dangerous characters (basic XSS prevention)
+  sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+  sanitized = sanitized.replace(/<[^>]*>/g, '')
+
+  return sanitized
+}
 
 // Validation rules
 const MAX_NAME_LENGTH = 50
@@ -74,7 +90,7 @@ watch(() => props.greeting, (newValue) => {
   localGreeting.value = newValue
 })
 
-// Emit updates
+// Emit updates with sanitization on blur
 const handleNameInput = (value: string) => {
   localName.value = value
   emit('update:name', value)
@@ -85,13 +101,55 @@ const handleGreetingInput = (value: string) => {
   emit('update:greeting', value)
 }
 
-// Expose validation state for parent components
+// Sanitize inputs on blur
+const handleNameBlur = () => {
+  const sanitized = sanitizeInput(localName.value)
+  if (sanitized !== localName.value) {
+    localName.value = sanitized
+    emit('update:name', sanitized)
+  }
+}
+
+const handleGreetingBlur = () => {
+  const sanitized = sanitizeInput(localGreeting.value)
+  if (sanitized !== localGreeting.value) {
+    localGreeting.value = sanitized
+    emit('update:greeting', sanitized)
+  }
+}
+
+// Clear form
+const clearForm = () => {
+  localName.value = ''
+  localGreeting.value = ''
+  emit('update:name', '')
+  emit('update:greeting', '')
+}
+
+// Reset to initial values
+const resetForm = () => {
+  localName.value = props.name
+  localGreeting.value = props.greeting
+  emit('update:name', props.name)
+  emit('update:greeting', props.greeting)
+  emit('reset')
+}
+
+// Check if form is dirty (has changes)
+const isDirty = computed(() => {
+  return localName.value !== props.name || localGreeting.value !== props.greeting
+})
+
+// Expose validation state and methods for parent components
 defineExpose({
   isValid: isFormValid,
   isNameValid,
   isGreetingValid,
   nameError,
-  greetingError
+  greetingError,
+  clearForm,
+  resetForm,
+  isDirty
 })
 </script>
 
@@ -112,6 +170,7 @@ defineExpose({
         :error="!isNameValid"
         :maxlength="MAX_NAME_LENGTH"
         @update:model-value="handleNameInput"
+        @blur="handleNameBlur"
       />
       <div class="flex items-center justify-between text-xs">
         <ErrorMessage v-if="nameError && localName.length > 0" :message="nameError" />
@@ -150,6 +209,7 @@ defineExpose({
           'bg-gray-100': props.disabled
         }"
         @input="handleGreetingInput(($event.target as HTMLTextAreaElement).value)"
+        @blur="handleGreetingBlur"
       />
       <div class="flex items-start justify-between text-xs gap-2">
         <ErrorMessage v-if="greetingError && localGreeting.length > 0" :message="greetingError" />
@@ -181,6 +241,32 @@ defineExpose({
           </ul>
         </div>
       </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div v-if="isDirty" class="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+      <button
+        type="button"
+        @click="resetForm"
+        :disabled="props.disabled"
+        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        <svg class="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+        </svg>
+        Reset
+      </button>
+      <button
+        type="button"
+        @click="clearForm"
+        :disabled="props.disabled"
+        class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        <svg class="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+        Clear All
+      </button>
     </div>
 
     <!-- Form Validation Status (hidden, for accessibility) -->

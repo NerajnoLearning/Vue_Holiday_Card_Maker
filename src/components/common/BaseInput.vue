@@ -21,11 +21,16 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
+  blur: []
 }>()
 
 const handleInput = (event: Event) => {
   const target = event.target as HTMLInputElement
   emit('update:modelValue', target.value)
+}
+
+const handleBlur = () => {
+  emit('blur')
 }
 
 const inputClasses = computed(() => {
@@ -52,5 +57,6 @@ const inputClasses = computed(() => {
     :maxlength="props.maxlength"
     :class="inputClasses"
     @input="handleInput"
+    @blur="handleBlur"
   />
 </template>
