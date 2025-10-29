@@ -28,7 +28,8 @@ const cardClasses = computed(() => {
 <template>
   <button
     type="button"
-    :class="cardClasses"
+    class="relative overflow-hidden rounded-lg border-4 touch-manipulation transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95"
+    :class="selected ? 'border-blue-500 shadow-lg' : 'border-gray-200 hover:border-gray-300'"
   >
     <img
       :src="template.thumbnail"
@@ -80,6 +81,10 @@ const cardClasses = computed(() => {
   }
 
   img {
+    transition: none !important;
+  }
+
+  button {
     transition: none !important;
   }
 }

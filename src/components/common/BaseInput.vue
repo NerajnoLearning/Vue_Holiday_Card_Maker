@@ -46,7 +46,7 @@ const inputClasses = computed(() => {
     'text-sm sm:text-base',
     'focus:outline-none focus:ring-2 focus:shadow-md',
     'touch-manipulation',
-    animations,
+    'transition-all duration-200 ease-in-out hover:border-gray-400',
     props.error
       ? 'border-red-300 focus:border-red-500 focus:ring-red-500 hover:border-red-400'
       : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500',
