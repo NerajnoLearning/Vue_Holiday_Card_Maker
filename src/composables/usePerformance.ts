@@ -72,7 +72,7 @@ export const usePerformance = () => {
         entries.forEach((entry) => {
           const fidEntry = entry as PerformanceEntry & { processingStart?: number }
           if (fidEntry.processingStart) {
-            metrics.value.fid = Math.round(entry.startTime - fidEntry.processingStart)
+            metrics.value.fid = Math.round(fidEntry.processingStart - entry.startTime)
           }
         })
       })
