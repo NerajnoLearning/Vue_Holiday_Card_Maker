@@ -134,7 +134,6 @@ const maxWidthClass = {
             'rounded-t-2xl sm:rounded-lg',
             'shadow-2xl',
             'max-h-[90vh] sm:max-h-[85vh]',
-            'overflow-y-auto',
             maxWidthClass
           ]"
           role="dialog"
