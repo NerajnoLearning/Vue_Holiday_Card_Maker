@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import HolidaySelector from '@/components/templates/HolidaySelector.vue'
 import TemplateCard from '@/components/templates/TemplateCard.vue'
