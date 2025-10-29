@@ -1,6 +1,8 @@
 import { ref } from 'vue'
 import { generatePDF, type PDFOptions } from '@/utils/export/pdf-generator'
 import { generateJPG, type JPGOptions } from '@/utils/export/jpg-generator'
+import { retryAsync } from '@/utils/retry'
+import { handleError } from '@/utils/error-logger'
 
 export type ExportFormat = 'pdf' | 'jpg'
 
@@ -8,6 +10,8 @@ export interface ExportOptions {
   format: ExportFormat
   filename?: string
   quality?: number
+  retry?: boolean
+  maxRetries?: number
 }
 
 export const useExport = () => {
@@ -15,16 +19,19 @@ export const useExport = () => {
   const error = ref<string | null>(null)
   const progress = ref(0)
   const currentFormat = ref<ExportFormat | null>(null)
+  const retryCount = ref(0)
 
   /**
-   * Export card as PDF
+   * Export card as PDF with retry support
    */
   const exportAsPDF = async (
     element: HTMLElement | null,
-    options: PDFOptions = {}
+    options: PDFOptions & { retry?: boolean; maxRetries?: number } = {}
   ): Promise<boolean> => {
     if (!element) {
-      error.value = 'No element provided for export'
+      const errorMsg = 'No element provided for export'
+      error.value = errorMsg
+      handleError(new Error(errorMsg), errorMsg, 'high', { format: 'pdf' })
       return false
     }
 
@@ -32,23 +39,47 @@ export const useExport = () => {
     error.value = null
     currentFormat.value = 'pdf'
     progress.value = 0
+    retryCount.value = 0
+
+    const { retry = false, maxRetries = 3, ...pdfOptions } = options
 
     try {
-      // Simulate progress
       progress.value = 30
 
-      const result = await generatePDF(element, options)
+      const exportFn = async () => {
+        const result = await generatePDF(element, pdfOptions)
+
+        if (!result.success) {
+          throw new Error(result.error || 'PDF export failed')
+        }
+
+        return result
+      }
+
+      // Use retry logic if enabled
+      if (retry) {
+        await retryAsync(exportFn, {
+          maxAttempts: maxRetries,
+          delay: 1000,
+          backoff: true,
+          onRetry: (attempt) => {
+            retryCount.value = attempt
+            progress.value = 30 + (attempt * 10)
+          }
+        });
+      } else {
+        await exportFn();
+      }
 
       progress.value = 100
 
-      if (!result.success) {
-        error.value = result.error || 'PDF export failed'
-        return false
-      }
-
       return true
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'PDF export failed'
+      const errorMsg = handleError(err, 'Failed to export PDF', 'high', {
+        format: 'pdf',
+        retryCount: retryCount.value
+      })
+      error.value = errorMsg
       return false
     } finally {
       isExporting.value = false
@@ -56,19 +87,22 @@ export const useExport = () => {
       // Reset progress after a delay
       setTimeout(() => {
         progress.value = 0
+        retryCount.value = 0
       }, 1000)
     }
   }
 
   /**
-   * Export card as JPG
+   * Export card as JPG with retry support
    */
   const exportAsJPG = async (
     element: HTMLElement | null,
-    options: JPGOptions = {}
+    options: JPGOptions & { retry?: boolean; maxRetries?: number } = {}
   ): Promise<boolean> => {
     if (!element) {
-      error.value = 'No element provided for export'
+      const errorMsg = 'No element provided for export'
+      error.value = errorMsg
+      handleError(new Error(errorMsg), errorMsg, 'high', { format: 'jpg' })
       return false
     }
 
@@ -76,23 +110,47 @@ export const useExport = () => {
     error.value = null
     currentFormat.value = 'jpg'
     progress.value = 0
+    retryCount.value = 0
+
+    const { retry = false, maxRetries = 3, ...jpgOptions } = options
 
     try {
-      // Simulate progress
       progress.value = 30
 
-      const result = await generateJPG(element, options)
+      const exportFn = async () => {
+        const result = await generateJPG(element, jpgOptions)
+
+        if (!result.success) {
+          throw new Error(result.error || 'JPG export failed')
+        }
+
+        return result
+      }
+
+      // Use retry logic if enabled
+      if (retry) {
+        await retryAsync(exportFn, {
+          maxAttempts: maxRetries,
+          delay: 1000,
+          backoff: true,
+          onRetry: (attempt) => {
+            retryCount.value = attempt
+            progress.value = 30 + (attempt * 10)
+          }
+        });
+      } else {
+        await exportFn();
+      }
 
       progress.value = 100
 
-      if (!result.success) {
-        error.value = result.error || 'JPG export failed'
-        return false
-      }
-
       return true
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'JPG export failed'
+      const errorMsg = handleError(err, 'Failed to export JPG', 'high', {
+        format: 'jpg',
+        retryCount: retryCount.value
+      })
+      error.value = errorMsg
       return false
     } finally {
       isExporting.value = false
@@ -100,6 +158,7 @@ export const useExport = () => {
       // Reset progress after a delay
       setTimeout(() => {
         progress.value = 0
+        retryCount.value = 0
       }, 1000)
     }
   }
@@ -135,6 +194,7 @@ export const useExport = () => {
     error,
     progress,
     currentFormat,
+    retryCount,
     exportAsPDF,
     exportAsJPG,
     exportCard,
