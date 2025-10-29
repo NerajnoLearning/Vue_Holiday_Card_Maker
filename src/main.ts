@@ -12,7 +12,8 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
     navigator.serviceWorker
       .register('/sw.js')
       .then(registration => {
-        console.log('SW registered:', registration.scope)
+        // Use console.info to ensure this message is not stripped in production by Terser
+        console.info('SW registered:', registration.scope)
       })
       .catch(error => {
         console.error('SW registration failed:', error)
