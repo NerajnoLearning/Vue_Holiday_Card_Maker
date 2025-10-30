@@ -208,7 +208,7 @@ npm run format       # Format code with Prettier
 
 ### Complete Project Structure
 
-g```
+```
 greeting-card-maker/
 ├── public/                          # Static assets served directly
 │   ├── favicon.ico
