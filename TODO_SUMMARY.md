@@ -1,6 +1,6 @@
 # Quick TODO Summary
 
-> **Last Updated**: October 29, 2024
+> **Last Updated**: November 18, 2025
 > **Full List**: See [README.md](./README.md#-todo-list)
 
 ## This Week (Critical) 🔴
@@ -18,8 +18,8 @@
 ## Next Week (High Priority) 🟠
 
 ### Week 2: Polish & Refactor
-7. ⬜ Refactor App.vue state management
-8. ⬜ Update dependencies
+7. ✅ Refactor App.vue state management
+8. ✅ Update dependencies
 9. ⬜ Complete E2E tests
 10. ⬜ WCAG contrast verification
 
@@ -32,7 +32,7 @@
 
 ## Ongoing
 
-- ✅ 97 tests passing
+- ✅ 104 tests passing
 - ✅ Dark mode implemented
 - ✅ TypeScript strict mode
 - ✅ Accessibility features

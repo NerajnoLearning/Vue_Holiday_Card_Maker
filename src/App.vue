@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref, computed, defineAsyncComponent } from 'vue'
+import { defineAsyncComponent } from 'vue'
 import { useGreetingCard } from '@/composables/useGreetingCard'
 import { useModal } from '@/composables/useModal'
 import { useDarkMode } from '@/composables/useDarkMode'
-import type { HolidayTemplate } from '@/types/template'
 
 // Eagerly loaded components (above the fold)
 import HolidaySelector from '@/components/templates/HolidaySelector.vue'
@@ -20,36 +19,22 @@ const CardForm = defineAsyncComponent(() => import('@/components/greeting-card/C
 const ExportModal = defineAsyncComponent(() => import('@/components/modal/ExportModal.vue'))
 const PreviewModal = defineAsyncComponent(() => import('@/components/modal/PreviewModal.vue'))
 
-// State management
-const selectedTemplate = ref<string>('christmas')
-const cardName = ref<string>('')
-const cardGreeting = ref<string>('')
-const uploadedPhoto = ref<File | null>(null)
+// Card state management from composable
+const {
+  templateId,
+  name,
+  greeting,
+  photo,
+  isValid,
+  setTemplate,
+  setName,
+  setGreeting,
+  setPhoto
+} = useGreetingCard()
 
 // Modals
 const { isOpen: isPreviewOpen, open: openPreview, close: closePreview } = useModal()
 const { isOpen: isExportOpen, open: openExport, close: closeExport } = useModal()
-
-// Handlers
-const handleTemplateSelect = (templateId: string) => {
-  selectedTemplate.value = templateId
-}
-
-const handlePhotoUpload = (photo: File | null) => {
-  uploadedPhoto.value = photo
-}
-
-const handleNameChange = (name: string) => {
-  cardName.value = name
-}
-
-const handleGreetingChange = (greeting: string) => {
-  cardGreeting.value = greeting
-}
-
-const canPreview = computed(() => {
-  return selectedTemplate.value && cardGreeting.value.trim().length > 0
-})
 </script>
 
 <template>
@@ -87,8 +72,8 @@ const canPreview = computed(() => {
               Step 1: Choose Template
             </h2>
             <HolidaySelector
-              :selected-template="selectedTemplate"
-              @select="handleTemplateSelect"
+              :selected-template="templateId"
+              @select="setTemplate"
             />
           </section>
 
@@ -98,7 +83,7 @@ const canPreview = computed(() => {
               Step 2: Upload Photo <span class="text-sm font-normal text-gray-500 dark:text-dark-text-muted">(Optional)</span>
             </h2>
             <PhotoUpload
-              @upload="handlePhotoUpload"
+              @upload="setPhoto"
             />
           </section>
 
@@ -108,17 +93,17 @@ const canPreview = computed(() => {
               Step 3: Add Your Message
             </h2>
             <CardForm
-              :name="cardName"
-              :greeting="cardGreeting"
-              @update:name="handleNameChange"
-              @update:greeting="handleGreetingChange"
+              :name="name"
+              :greeting="greeting"
+              @update:name="setName"
+              @update:greeting="setGreeting"
             />
           </section>
 
           <!-- Action Buttons -->
           <div class="flex gap-4" role="group" aria-label="Card actions">
             <BaseButton
-              :disabled="!canPreview"
+              :disabled="!isValid"
               @click="openPreview"
               class="flex-1"
               aria-label="Preview your greeting card"
@@ -126,7 +111,7 @@ const canPreview = computed(() => {
               Preview Card
             </BaseButton>
             <BaseButton
-              :disabled="!canPreview"
+              :disabled="!isValid"
               @click="openExport"
               variant="secondary"
               class="flex-1"
@@ -144,10 +129,10 @@ const canPreview = computed(() => {
           </h2>
           <div class="flex items-center justify-center min-h-[500px]" aria-live="polite" aria-atomic="true">
             <GreetingCard
-              :template="selectedTemplate"
-              :name="cardName"
-              :greeting="cardGreeting"
-              :photo="uploadedPhoto"
+              :template="templateId"
+              :name="name"
+              :greeting="greeting"
+              :photo="photo"
             />
           </div>
         </div>
@@ -166,10 +151,10 @@ const canPreview = computed(() => {
       v-if="isPreviewOpen"
       title="Card Preview"
       description="Full-size preview of your greeting card"
-      :template="selectedTemplate"
-      :name="cardName"
-      :greeting="cardGreeting"
-      :photo="uploadedPhoto"
+      :template="templateId"
+      :name="name"
+      :greeting="greeting"
+      :photo="photo"
       @close="closePreview"
     />
 
@@ -177,10 +162,10 @@ const canPreview = computed(() => {
       v-if="isExportOpen"
       title="Export Card"
       description="Download your greeting card as PDF or JPG"
-      :template="selectedTemplate"
-      :name="cardName"
-      :greeting="cardGreeting"
-      :photo="uploadedPhoto"
+      :template="templateId"
+      :name="name"
+      :greeting="greeting"
+      :photo="photo"
       @close="closeExport"
     />
   </div>
