@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { GreetingCardProps } from '@/types/card'
+import { HOLIDAY_TEMPLATES } from '@/utils/constants/templates'
 
 interface Props {
   name?: string
@@ -16,10 +17,17 @@ const props = withDefaults(defineProps<Props>(), {
   template: 'christmas'
 })
 
+// Get the full template object
+const templateData = computed(() => {
+  return HOLIDAY_TEMPLATES.find(t => t.id === props.template) || HOLIDAY_TEMPLATES[0]
+})
+
 // Computed properties
 const cardClasses = computed(() => ({
   [`template-${props.template}`]: props.template
 }))
+
+const backgroundUrl = computed(() => templateData.value.background)
 
 const photoUrl = computed(() => {
   if (!props.photo) return ''
@@ -37,7 +45,7 @@ const photoAlt = computed(() => `Photo for ${props.name || 'greeting card'}`)
       <div
         :key="template"
         class="absolute inset-0 bg-cover bg-center transition-all duration-500"
-        :style="{ backgroundImage: `url(/templates/${template}/background.jpg)` }"
+        :style="{ backgroundImage: `url(${backgroundUrl})` }"
       />
     </Transition>
 
@@ -54,13 +62,13 @@ const photoAlt = computed(() => `Photo for ${props.name || 'greeting card'}`)
       </Transition>
 
       <Transition name="text-fade" mode="out-in">
-        <h1 :key="greeting" class="card-greeting text-3xl md:text-4xl font-bold text-white mb-4 drop-shadow-lg">
+        <h1 :key="greeting" class="card-greeting text-3xl md:text-4xl font-bold text-black mb-4 drop-shadow-lg">
           {{ greeting }}
         </h1>
       </Transition>
 
       <Transition name="text-fade" mode="out-in">
-        <p :key="name" class="card-name text-xl md:text-2xl text-white drop-shadow-md">
+        <p :key="name" class="card-name text-xl md:text-2xl text-black drop-shadow-md">
           {{ name }}
         </p>
       </Transition>

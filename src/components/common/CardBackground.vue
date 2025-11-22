@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { HOLIDAY_TEMPLATES } from '@/utils/constants/templates'
 
 interface Props {
   templateId?: string
@@ -12,8 +13,12 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const bgImage = computed(() => {
+  // If explicit background URL is provided, use it
   if (props.backgroundUrl) return props.backgroundUrl
-  return `/assets/templates/backgrounds/${props.templateId}-bg.jpg`
+
+  // Otherwise, look up the template background from HOLIDAY_TEMPLATES
+  const template = HOLIDAY_TEMPLATES.find(t => t.id === props.templateId)
+  return template?.background || HOLIDAY_TEMPLATES[0].background
 })
 </script>
 
