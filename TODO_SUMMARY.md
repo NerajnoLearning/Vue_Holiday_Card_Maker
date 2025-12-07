@@ -1,46 +1,67 @@
 # Quick TODO Summary
 
-> **Last Updated**: November 18, 2025
+> **Last Updated**: November 22, 2025
 > **Full List**: See [README.md](./README.md#-todo-list)
 
-## This Week (Critical) 🔴
+## Current Status 📊
 
-### Day 1-2: Core Functionality
-1. ✅ Add template images to `/public/assets/templates/`
-2. ✅ Remove duplicate GreetingCard component
-3. ✅ Implement useGreetingCard composable
+- **Tests**: 102 passing / 2 failing (104 total)
+- **Dev Server**: ✅ Running on port 3001
+- **Build**: ✅ Passing
+- **TypeScript**: ✅ Strict mode enabled
 
-### Day 3: Security & Testing
-4. ✅ Fix v-html security issue in ToastContainer
-5. ✅ Add CSP headers
-6. ✅ Write useGreetingCard tests
+## Today (Critical) 🔴
 
-## Next Week (High Priority) 🟠
+### Immediate Fixes Needed
 
-### Week 2: Polish & Refactor
-7. ✅ Refactor App.vue state management
-8. ✅ Update dependencies
-9. ⬜ Complete E2E tests
-10. ⬜ WCAG contrast verification
+1. ⚠️ **Fix Failing Tests** (2 tests failing)
+   - `useTemplates.spec.ts` - Update path assertions for Unsplash URLs
+   - Tests expect `/assets/templates/` but we're using Unsplash CDN
+   - **Action**: Update test expectations or revert to local images
 
-## Later (Medium Priority) 🟡
+2. ⬜ **Template Images** - Still using placeholders
+   - Current: Using Unsplash CDN (temporary solution)
+   - Files in `/public/assets/templates/` are 21-byte placeholders
+   - **Action**: Download and add real images OR update tests to accept CDN URLs
 
-- Image optimization (WebP)
-- Error boundaries
-- Performance tuning
-- Documentation updates
+3. ⬜ **Security: v-html in ToastContainer**
+   - File: `src/components/common/ToastContainer.vue`
+   - **Action**: Replace v-html with component-based icons
 
-## Ongoing
+## This Week (High Priority) 🟠
 
-- ✅ 104 tests passing
-- ✅ Dark mode implemented
-- ✅ TypeScript strict mode
-- ✅ Accessibility features
+4. ✅ **Refactor App.vue state management** - Using `useGreetingCard()` composable
+5. ⬜ **Complete E2E tests** - Playwright setup exists, needs test implementation
+6. ⬜ **WCAG contrast verification** - Dark mode colors need validation
+7. ⬜ **Add CSP headers** - Security headers in vite.config.ts
+
+## Completed Recently ✅
+
+- ✅ Implemented `useGreetingCard` composable with full functionality
+- ✅ Fixed image implementation (GreetingCard.vue, CardBackground.vue)
+- ✅ Migrated to Unsplash CDN for template images
+- ✅ Dark mode fully implemented with toggle
+- ✅ TypeScript strict mode enabled
+- ✅ 102 unit tests passing
+
+## Next Sprint (Medium Priority) 🟡
+
+- Image optimization (WebP conversion)
+- Error boundaries implementation
+- Performance tuning (Lighthouse optimization)
+- Dependency updates (Vue 3.5.24 is current)
+
+## Known Issues ⚠️
+
+1. **Test Failures**: 2 tests in `useTemplates.spec.ts` expect local paths
+2. **Placeholder Images**: Local image files are text placeholders (21 bytes)
+3. **v-html Usage**: Security concern in ToastContainer component
+4. **Vue Warnings**: useDarkMode tests trigger lifecycle warnings (non-critical)
 
 ---
 
 **Priority Legend**:
-- 🔴 Critical - Must fix before launch
+- 🔴 Critical - Fix today/this week
 - 🟠 High - Fix before production
 - 🟡 Medium - Next sprint
 - 🟢 Low - Technical debt
