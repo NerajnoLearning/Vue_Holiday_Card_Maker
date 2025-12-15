@@ -1,4 +1,4 @@
-import { ref, readonly } from 'vue'
+import { ref, readonly, type Ref } from 'vue'
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info'
 
@@ -13,10 +13,17 @@ export interface Toast {
   }
 }
 
-const toasts = ref<Toast[]>([])
+// Shared state (initialized lazily)
+let toastsRef: Ref<Toast[]> | null = null
 let idCounter = 0
 
 export const useToast = () => {
+  // Initialize shared state only once
+  if (!toastsRef) {
+    toastsRef = ref<Toast[]>([])
+  }
+
+  const toasts = toastsRef
   const add = (
     message: string,
     type: ToastType = 'info',

@@ -1,14 +1,22 @@
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, type Ref } from 'vue'
 
 export type Theme = 'light' | 'dark' | 'system'
 
 const STORAGE_KEY = 'greeting-card-maker-theme'
 
-// Shared state across all instances
-const isDark = ref(false)
-const theme = ref<Theme>('system')
+// Shared state across all instances (initialized lazily)
+let isDarkRef: Ref<boolean> | null = null
+let themeRef: Ref<Theme> | null = null
 
 export const useDarkMode = () => {
+  // Initialize shared state only once
+  if (!isDarkRef) {
+    isDarkRef = ref(false)
+    themeRef = ref<Theme>('system')
+  }
+
+  const isDark = isDarkRef
+  const theme = themeRef!
   /**
    * Get the system preference for dark mode
    */
@@ -20,10 +28,10 @@ export const useDarkMode = () => {
   /**
    * Apply the theme to the document
    */
-  const applyTheme = (dark: boolean) => {
+  const applyTheme = (shouldBeDark: boolean) => {
     if (typeof document === 'undefined') return
 
-    if (dark) {
+    if (shouldBeDark) {
       document.documentElement.classList.add('dark')
     } else {
       document.documentElement.classList.remove('dark')
