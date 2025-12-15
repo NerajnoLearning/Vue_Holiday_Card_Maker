@@ -13,17 +13,25 @@ export interface Toast {
   }
 }
 
-// Shared state (initialized lazily)
-let toastsRef: Ref<Toast[]> | null = null
+// Create shared state singleton
+const createSharedState = () => {
+  return {
+    toasts: ref<Toast[]>([])
+  }
+}
+
+let sharedState: ReturnType<typeof createSharedState> | null = null
 let idCounter = 0
 
-export const useToast = () => {
-  // Initialize shared state only once
-  if (!toastsRef) {
-    toastsRef = ref<Toast[]>([])
+const getSharedState = () => {
+  if (!sharedState) {
+    sharedState = createSharedState()
   }
+  return sharedState
+}
 
-  const toasts = toastsRef
+export const useToast = () => {
+  const { toasts } = getSharedState()
   const add = (
     message: string,
     type: ToastType = 'info',

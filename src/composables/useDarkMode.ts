@@ -4,19 +4,25 @@ export type Theme = 'light' | 'dark' | 'system'
 
 const STORAGE_KEY = 'greeting-card-maker-theme'
 
-// Shared state across all instances (initialized lazily)
-let isDarkRef: Ref<boolean> | null = null
-let themeRef: Ref<Theme> | null = null
+// Create shared state singleton
+const createSharedState = () => {
+  return {
+    isDark: ref(false),
+    theme: ref<Theme>('system')
+  }
+}
+
+let sharedState: ReturnType<typeof createSharedState> | null = null
+
+const getSharedState = () => {
+  if (!sharedState) {
+    sharedState = createSharedState()
+  }
+  return sharedState
+}
 
 export const useDarkMode = () => {
-  // Initialize shared state only once
-  if (!isDarkRef) {
-    isDarkRef = ref(false)
-    themeRef = ref<Theme>('system')
-  }
-
-  const isDark = isDarkRef
-  const theme = themeRef!
+  const { isDark, theme } = getSharedState()
   /**
    * Get the system preference for dark mode
    */
