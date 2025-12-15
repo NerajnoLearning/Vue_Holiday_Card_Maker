@@ -23,7 +23,8 @@ export const useToast = () => {
     duration: number = 5000,
     action?: Toast['action']
   ): string => {
-    const id = `toast-${Date.now()}-${idCounter++}`
+    idCounter++
+    const id = `toast-${Date.now()}-${idCounter}`
 
     const toast: Toast = {
       id,
