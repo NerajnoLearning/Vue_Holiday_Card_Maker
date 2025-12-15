@@ -130,7 +130,9 @@ export const useFocusTrap = (containerRef: HTMLElement | null) => {
  */
 let idCounter = 0
 export const useId = (prefix = 'a11y'): string => {
-  return `${prefix}-${++idCounter}`
+  // Increment counter and generate ID
+  idCounter++
+  return `${prefix}-${idCounter}`
 }
 
 /**
