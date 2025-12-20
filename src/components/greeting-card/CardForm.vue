@@ -167,9 +167,9 @@ defineExpose({
   <form class="space-y-4 sm:space-y-6" @submit.prevent>
     <!-- Name Input Section -->
     <div class="space-y-2">
-      <label for="recipient-name" class="block text-sm sm:text-base font-medium text-gray-700">
+      <label for="recipient-name" class="block text-sm sm:text-base font-medium text-gray-700 dark:text-dark-text-primary">
         Recipient Name
-        <span class="text-red-500">*</span>
+        <span class="text-red-500 dark:text-red-400">*</span>
       </label>
       <BaseInput
         id="recipient-name"
@@ -188,9 +188,9 @@ defineExpose({
           :class="[
             'sm:ml-auto',
             {
-              'text-gray-500': nameCharsRemaining > 10,
-              'text-orange-600': nameCharsRemaining <= 10 && nameCharsRemaining > 0,
-              'text-red-600': nameCharsRemaining <= 0
+              'text-gray-500 dark:text-dark-text-muted': nameCharsRemaining > 10,
+              'text-orange-600 dark:text-orange-400': nameCharsRemaining <= 10 && nameCharsRemaining > 0,
+              'text-red-600 dark:text-red-400': nameCharsRemaining <= 0
             }
           ]"
         >
@@ -201,9 +201,9 @@ defineExpose({
 
     <!-- Greeting Message Input Section -->
     <div class="space-y-2">
-      <label for="greeting-message" class="block text-sm sm:text-base font-medium text-gray-700">
+      <label for="greeting-message" class="block text-sm sm:text-base font-medium text-gray-700 dark:text-dark-text-primary">
         Greeting Message
-        <span class="text-red-500">*</span>
+        <span class="text-red-500 dark:text-red-400">*</span>
       </label>
       <textarea
         id="greeting-message"
@@ -212,13 +212,13 @@ defineExpose({
         :maxlength="MAX_GREETING_LENGTH"
         rows="6"
         placeholder="Write your heartfelt greeting message here..."
-        class="w-full px-3 py-2 sm:px-4 sm:py-3 border rounded-lg shadow-sm transition-all duration-200 resize-none focus:outline-none focus:ring-2 text-sm sm:text-base touch-manipulation"
+        class="w-full px-3 py-2 sm:px-4 sm:py-3 border rounded-lg shadow-sm transition-all duration-200 resize-none focus:outline-none focus:ring-2 text-sm sm:text-base touch-manipulation dark:text-dark-text-primary"
         :class="{
-          'border-gray-300 focus:border-blue-500 focus:ring-blue-500': !greetingError || localGreeting.length === 0,
-          'border-red-300 focus:border-red-500 focus:ring-red-500': greetingError && localGreeting.length > 0,
+          'border-gray-300 dark:border-dark-border focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400': !greetingError || localGreeting.length === 0,
+          'border-red-300 dark:border-red-400 focus:border-red-500 dark:focus:border-red-400 focus:ring-red-500 dark:focus:ring-red-400': greetingError && localGreeting.length > 0,
           'opacity-50 cursor-not-allowed': props.disabled,
-          'bg-white': !props.disabled,
-          'bg-gray-100': props.disabled
+          'bg-white dark:bg-dark-surface': !props.disabled,
+          'bg-gray-100 dark:bg-dark-bg': props.disabled
         }"
         @input="handleGreetingInput(($event.target as HTMLTextAreaElement).value)"
         @blur="handleGreetingBlur"
@@ -228,9 +228,9 @@ defineExpose({
         <div
           class="sm:ml-auto flex-shrink-0"
           :class="{
-            'text-gray-500': greetingCharsRemaining > 50,
-            'text-orange-600': greetingCharsRemaining <= 50 && greetingCharsRemaining > 0,
-            'text-red-600': greetingCharsRemaining <= 0
+            'text-gray-500 dark:text-dark-text-muted': greetingCharsRemaining > 50,
+            'text-orange-600 dark:text-orange-400': greetingCharsRemaining <= 50 && greetingCharsRemaining > 0,
+            'text-red-600 dark:text-red-400': greetingCharsRemaining <= 0
           }"
         >
           {{ greetingCharsRemaining }} / {{ MAX_GREETING_LENGTH }}
@@ -239,14 +239,14 @@ defineExpose({
     </div>
 
     <!-- Helper Text -->
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-blue-800">
+    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-blue-800 dark:text-blue-200">
       <div class="flex items-start gap-2 sm:gap-3">
         <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
           <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
         </svg>
         <div class="min-w-0 flex-1">
           <p class="font-medium mb-1 sm:mb-2">Tips for a great greeting card:</p>
-          <ul class="list-disc list-inside space-y-0.5 sm:space-y-1 text-blue-700">
+          <ul class="list-disc list-inside space-y-0.5 sm:space-y-1 text-blue-700 dark:text-blue-300">
             <li class="leading-relaxed">Keep it personal and heartfelt</li>
             <li class="leading-relaxed">Include specific memories or inside jokes</li>
             <li class="leading-relaxed">Express genuine emotions and well wishes</li>
@@ -264,7 +264,7 @@ defineExpose({
     <Transition name="form-actions">
       <div
         v-if="isDirty"
-        class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200"
+        class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200 dark:border-dark-border"
         role="region"
         aria-label="Form actions"
       >
@@ -272,7 +272,7 @@ defineExpose({
           type="button"
           @click="resetForm"
           :disabled="props.disabled"
-          class="px-4 py-2.5 sm:py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
+          class="px-4 py-2.5 sm:py-2 text-sm font-medium text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-surface border border-gray-300 dark:border-dark-border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
           aria-label="Reset form to initial values"
         >
           <svg class="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -284,7 +284,7 @@ defineExpose({
           type="button"
           @click="clearForm"
           :disabled="props.disabled"
-          class="px-4 py-2.5 sm:py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 active:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
+          class="px-4 py-2.5 sm:py-2 text-sm font-medium text-white bg-red-600 dark:bg-red-700 rounded-lg hover:bg-red-700 dark:hover:bg-red-600 active:bg-red-800 dark:active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
           aria-label="Clear all form fields"
         >
           <svg class="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

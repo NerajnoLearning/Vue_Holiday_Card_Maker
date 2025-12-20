@@ -16,13 +16,13 @@ const { prefersReducedMotion } = useReducedMotion();
 
 const cardClasses = computed(() => {
   const base =
-    'relative overflow-hidden rounded-lg border-4 touch-manipulation';
+    'relative overflow-hidden rounded-lg border-4 touch-manipulation bg-white dark:bg-dark-surface';
   const animations = prefersReducedMotion.value
     ? 'transition-colors duration-200'
     : 'transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95';
   const border = props.selected
-    ? 'border-blue-500 shadow-lg'
-    : 'border-gray-200 hover:border-gray-300';
+    ? 'border-blue-500 dark:border-blue-400 shadow-lg'
+    : 'border-gray-200 dark:border-dark-border hover:border-gray-300 dark:hover:border-gray-600';
 
   return `${base} ${animations} ${border}`;
 });

@@ -7,11 +7,16 @@ const { isDark, toggleDarkMode } = useDarkMode()
 const ariaLabel = computed(() =>
   isDark.value ? 'Switch to light mode' : 'Switch to dark mode'
 )
+
+const handleClick = () => {
+  console.log('Button clicked in DarkModeToggle component!')
+  toggleDarkMode()
+}
 </script>
 
 <template>
   <button
-    @click="toggleDarkMode"
+    @click="handleClick"
     :aria-label="ariaLabel"
     class="
       relative inline-flex items-center justify-center

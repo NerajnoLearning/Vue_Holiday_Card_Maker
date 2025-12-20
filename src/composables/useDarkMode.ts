@@ -8,7 +8,8 @@ const STORAGE_KEY = 'greeting-card-maker-theme'
 const createSharedState = () => {
   return {
     isDark: ref(false),
-    theme: ref<Theme>('system')
+    theme: ref<Theme>('system'),
+    initialized: ref(false)
   }
 }
 
@@ -22,7 +23,7 @@ const getSharedState = () => {
 }
 
 export const useDarkMode = () => {
-  const { isDark, theme } = getSharedState()
+  const { isDark, theme, initialized } = getSharedState()
   /**
    * Get the system preference for dark mode
    */
@@ -37,10 +38,13 @@ export const useDarkMode = () => {
   const applyTheme = (shouldBeDark: boolean) => {
     if (typeof document === 'undefined') return
 
+    console.log('Applying theme. shouldBeDark:', shouldBeDark)
     if (shouldBeDark) {
       document.documentElement.classList.add('dark')
+      console.log('Added dark class to html element')
     } else {
       document.documentElement.classList.remove('dark')
+      console.log('Removed dark class from html element')
     }
   }
 
@@ -69,11 +73,13 @@ export const useDarkMode = () => {
    * Toggle between light and dark (skips system)
    */
   const toggleDarkMode = () => {
+    console.log('Toggle clicked! Current isDark:', isDark.value)
     if (isDark.value) {
       setTheme('light')
     } else {
       setTheme('dark')
     }
+    console.log('After toggle, isDark:', isDark.value, 'theme:', theme.value)
   }
 
   /**
@@ -109,9 +115,12 @@ export const useDarkMode = () => {
     }
   }
 
-  // Initialize on mount
+  // Initialize on mount (only once for the first component)
   onMounted(() => {
-    initializeDarkMode()
+    if (!initialized.value) {
+      initialized.value = true
+      initializeDarkMode()
+    }
   })
 
   // Watch theme changes
