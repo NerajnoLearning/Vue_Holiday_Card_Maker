@@ -142,7 +142,7 @@ const { isOpen: isExportOpen, open: openExport, close: closeExport } = useModal(
     <!-- Footer -->
     <footer class="bg-white dark:bg-dark-surface mt-12 border-t border-gray-200 dark:border-dark-border transition-colors duration-300" role="contentinfo">
       <div class="container mx-auto px-4 py-6 text-center text-gray-600 dark:text-dark-text-secondary transition-colors duration-300">
-        <p>&copy; 2024 Holiday Greeting Card Maker. Built with Vue 3 + TypeScript.</p>
+        <p>&copy; 2025 Holiday Greeting Card Maker. Built with Vue 3 + TypeScript.</p>
       </div>
     </footer>
 
