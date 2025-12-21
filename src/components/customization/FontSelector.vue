@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, onUnmounted, nextTick } from 'vue'
 import { DEFAULT_FONTS } from '@/types/customization'
 
 interface Props {
@@ -38,14 +38,23 @@ const handleClickOutside = (event: MouseEvent) => {
 
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value
-  if (showDropdown.value) {
-    setTimeout(() => {
+}
+
+// Handle click outside logic in a watch
+watch(showDropdown, (isOpen) => {
+  if (isOpen) {
+    nextTick(() => {
       document.addEventListener('click', handleClickOutside)
-    }, 0)
+    })
   } else {
     document.removeEventListener('click', handleClickOutside)
   }
-}
+})
+
+// Clean up event listener when component is unmounted
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <template>
@@ -55,11 +64,8 @@ const toggleDropdown = () => {
     </label>
 
     <!-- Font Display Button -->
-    <button
-      type="button"
-      @click="toggleDropdown"
-      class="flex items-center justify-between w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-    >
+    <button type="button" @click="toggleDropdown"
+      class="flex items-center justify-between w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
       <span class="text-sm font-medium text-gray-700" :style="{ fontFamily: selectedFont.value }">
         {{ selectedFont.label }}
       </span>
@@ -70,35 +76,22 @@ const toggleDropdown = () => {
 
     <!-- Font Dropdown -->
     <Transition name="dropdown">
-      <div
-        v-if="showDropdown"
-        class="absolute z-10 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 max-h-64 overflow-y-auto"
-      >
-        <button
-          v-for="font in fonts"
-          :key="font.value"
-          type="button"
-          @click="handleFontSelect(font)"
+      <div v-if="showDropdown"
+        class="absolute z-10 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 max-h-64 overflow-y-auto">
+        <button v-for="font in fonts" :key="font.value" type="button" @click="handleFontSelect(font)"
           class="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between"
           :class="{
             'bg-blue-50 text-blue-700': selectedFont.value === font.value,
             'text-gray-700': selectedFont.value !== font.value
-          }"
-        >
+          }">
           <span :style="{ fontFamily: font.value }" class="text-sm">
             {{ font.label }}
           </span>
-          <svg
-            v-if="selectedFont.value === font.value"
-            class="w-5 h-5 text-blue-600"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fill-rule="evenodd"
+          <svg v-if="selectedFont.value === font.value" class="w-5 h-5 text-blue-600" fill="currentColor"
+            viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
               d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-              clip-rule="evenodd"
-            />
+              clip-rule="evenodd" />
           </svg>
         </button>
       </div>

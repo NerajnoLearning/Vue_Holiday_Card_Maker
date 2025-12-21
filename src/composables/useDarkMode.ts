@@ -128,6 +128,18 @@ export const useDarkMode = () => {
     updateDarkMode()
   })
 
+  // TODO(human): Add onUnmounted hook here to clean up the mediaQuery listener
+  // The listener is created in initializeDarkMode() (lines 98-115) but never removed
+  //
+  // Steps:
+  // 1. Store mediaQuery and handleChange as module-level variables (add them near line 16 with sharedState)
+  // 2. Import onUnmounted from 'vue' on line 1
+  // 3. In onUnmounted, call mediaQuery.removeEventListener('change', handleChange)
+  //    OR mediaQuery.removeListener(handleChange) for older browsers
+  //
+  // BONUS CHALLENGE: Since this is a singleton (shared state), consider tracking how many
+  // components are using it and only cleanup when the last component unmounts!
+
   return {
     isDark,
     theme,

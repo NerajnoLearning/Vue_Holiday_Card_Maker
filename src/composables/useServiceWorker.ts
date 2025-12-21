@@ -20,7 +20,10 @@ export const useServiceWorker = () => {
   const updateAvailable = ref(false)
   const error = ref<string | null>(null)
 
-  let refreshing = false
+  const refreshing = ref(false)
+  let controllerChangeListener: (() => void) | null = null
+  let updateFoundListener: (() => void) | null = null
+  let stateChangeListener: (() => void) | null = null
 
   /**
    * Check if service workers are supported
@@ -46,6 +49,12 @@ export const useServiceWorker = () => {
       return null
     }
 
+    // Prevent duplicate registration
+    if (registration.value) {
+      console.log('[SW] Service Worker already registered')
+      return registration.value
+    }
+
     try {
       status.value = 'installing'
       const reg = await navigator.serviceWorker.register('/sw.js', {
@@ -57,11 +66,11 @@ export const useServiceWorker = () => {
       console.log('[SW] Service Worker registered:', reg.scope)
 
       // Check for updates
-      reg.addEventListener('updatefound', () => {
+      updateFoundListener = () => {
         const newWorker = reg.installing
         if (!newWorker) return
 
-        newWorker.addEventListener('statechange', () => {
+        stateChangeListener = () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
             console.log('[SW] New version available')
             updateAvailable.value = true
@@ -70,8 +79,10 @@ export const useServiceWorker = () => {
             console.log('[SW] Service Worker activated')
             status.value = 'active'
           }
-        })
-      })
+        }
+        newWorker.addEventListener('statechange', stateChangeListener)
+      }
+      reg.addEventListener('updatefound', updateFoundListener)
 
       // Check initial state
       if (reg.active) {
@@ -132,12 +143,18 @@ export const useServiceWorker = () => {
 
     registration.value.waiting.postMessage({ type: 'SKIP_WAITING' })
 
+    // Clean up previous listener if it exists
+    if (controllerChangeListener) {
+      navigator.serviceWorker.removeEventListener('controllerchange', controllerChangeListener)
+    }
+
     // Reload page when new worker activates
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (refreshing) return
-      refreshing = true
+    controllerChangeListener = () => {
+      if (refreshing.value) return
+      refreshing.value = true
       window.location.reload()
-    })
+    }
+    navigator.serviceWorker.addEventListener('controllerchange', controllerChangeListener)
   }
 
   /**
@@ -146,12 +163,24 @@ export const useServiceWorker = () => {
   const clearCache = async (): Promise<void> => {
     if (!registration.value?.active) return
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const messageChannel = new MessageChannel()
+      const TIMEOUT_MS = 5000
+
+      const timeout = setTimeout(() => {
+        messageChannel.port1.close()
+        reject(new Error('Cache clear operation timed out'))
+      }, TIMEOUT_MS)
+
       messageChannel.port1.onmessage = (event) => {
+        clearTimeout(timeout)
         if (event.data.type === 'CACHE_CLEARED') {
           console.log('[SW] Cache cleared')
+          messageChannel.port1.close()
           resolve()
+        } else {
+          messageChannel.port1.close()
+          reject(new Error('Unexpected response from service worker'))
         }
       }
 
@@ -168,12 +197,24 @@ export const useServiceWorker = () => {
   const getCacheSize = async (): Promise<number> => {
     if (!registration.value?.active) return 0
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const messageChannel = new MessageChannel()
+      const TIMEOUT_MS = 5000
+
+      const timeout = setTimeout(() => {
+        messageChannel.port1.close()
+        reject(new Error('Get cache size operation timed out'))
+      }, TIMEOUT_MS)
+
       messageChannel.port1.onmessage = (event) => {
+        clearTimeout(timeout)
         if (event.data.type === 'CACHE_SIZE') {
           console.log('[SW] Cache size:', event.data.size)
+          messageChannel.port1.close()
           resolve(event.data.size)
+        } else {
+          messageChannel.port1.close()
+          reject(new Error('Unexpected response from service worker'))
         }
       }
 
@@ -205,6 +246,16 @@ export const useServiceWorker = () => {
   onUnmounted(() => {
     window.removeEventListener('online', updateOnlineStatus)
     window.removeEventListener('offline', updateOnlineStatus)
+
+    // Clean up service worker event listeners
+    if (controllerChangeListener) {
+      navigator.serviceWorker.removeEventListener('controllerchange', controllerChangeListener)
+    }
+    if (registration.value && updateFoundListener) {
+      registration.value.removeEventListener('updatefound', updateFoundListener)
+    }
+    // Note: stateChangeListener is attached to a Worker instance that may be garbage collected
+    // In a production app, you might want to track the worker instance to clean it up
   })
 
   return {
