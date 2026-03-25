@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { GreetingCardProps } from '@/types/card'
 import { HOLIDAY_TEMPLATES } from '@/utils/constants/templates'
 
 interface Props {

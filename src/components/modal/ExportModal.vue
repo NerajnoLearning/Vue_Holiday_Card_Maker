@@ -54,7 +54,7 @@ const handleExport = async () => {
     quality: selectedFormat.value === 'pdf' ? 0.95 : 0.92
   }
 
-  let success = false
+  let success: boolean
 
   if (selectedFormat.value === 'pdf') {
     success = await exportAsPDF(element, options)

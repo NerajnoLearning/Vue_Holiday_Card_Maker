@@ -61,13 +61,6 @@ A modern, accessible Vue 3 + TypeScript application for creating personalized ho
 
 ### 🟡 Medium Priority (Next Sprint)
 
-- [ ] **Dependency Updates**
-  - [ ] Update Vue from 3.5.18 to 3.5.22
-  - [ ] Update Vite from 6.3.5 to 7.1.12
-  - [ ] Update TypeScript from 5.8.3 to 5.9.3
-  - [ ] Update other outdated dependencies (16 packages)
-  - [ ] Run full test suite after updates
-
 - [ ] **Image Optimization**
   - [ ] Add WebP versions of template images with fallbacks
   - [ ] Implement responsive images with `srcset`
@@ -124,6 +117,9 @@ A modern, accessible Vue 3 + TypeScript application for creating personalized ho
 
 ### ✅ Recently Completed
 
+- [x] **Full dependency upgrade** - TypeScript 6, Vite 8 (Rolldown), Vitest 4, ESLint 10, jsPDF 4, vue-router 5, @types/node 25, jsdom 29
+- [x] **ESLint flat config migration** - Migrated from legacy `.eslintrc.js` to `eslint.config.js` (ESLint 10 format)
+- [x] **Bug fixes found during linting** - `BaseButton` now correctly respects `prefersReducedMotion`, `BaseInput` uses computed animation class
 - [x] Dark mode implementation with toggle switch
 - [x] Comprehensive testing suite (97 tests passing)
 - [x] PWA support with service worker
@@ -138,7 +134,7 @@ A modern, accessible Vue 3 + TypeScript application for creating personalized ho
 ## 📊 Project Status
 
 **Version**: 1.0.0 (MVP)
-**Last Updated**: October 29, 2024
+**Last Updated**: March 24, 2026
 **Status**: 🟡 Pre-Production (Critical fixes needed)
 
 **Test Results**:
@@ -149,10 +145,10 @@ A modern, accessible Vue 3 + TypeScript application for creating personalized ho
 ✓ Build: Passing
 ```
 
-**Bundle Size**:
-- Vue vendor: 73 KB (29 KB gzipped) ✓
-- Main bundle: 157 KB (51 KB gzipped) ✓
-- Export libs: 585 KB (169 KB gzipped, lazy-loaded) ✓
+**Bundle Size** (Vite 8 / Rolldown):
+- Vue vendor: 75.8 KB (29.4 KB gzipped) ✓
+- Main bundle: 151.6 KB (48.9 KB gzipped) ✓
+- Export libs: 616.2 KB (180 KB gzipped, lazy-loaded) ✓
 - **Total**: ~1.0 MB
 
 ## 🛠 Recommended IDE Setup
@@ -165,7 +161,7 @@ TypeScript cannot handle type information for `.vue` imports by default, so we r
 
 ## Customize configuration
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+See [Vite Configuration Reference](https://vite.dev/config/). This project uses Vite 8, which uses [Rolldown](https://rolldown.rs) as its bundler.
 
 ## 🚀 Quick Start
 
@@ -188,8 +184,9 @@ npm run type-check   # Run TypeScript type checking
 npm run test:unit           # Run unit tests
 npm run test:watch          # Run tests in watch mode
 npm run test:coverage       # Generate coverage report
-npm run test:e2e            # Run E2E tests (requires dev server)
-npm run test:e2e:open       # Open Cypress Test Runner
+npm run test:e2e            # Run E2E tests with Playwright
+npm run test:e2e:ui         # Open Playwright UI mode
+npm run test:e2e:headed     # Run E2E tests in headed (visible) browser
 ```
 
 ### Production Build
@@ -339,7 +336,7 @@ greeting-card-maker/
 │
 ├── .env.example                     # Environment variables template
 ├── .gitignore                       # Git ignore rules
-├── .eslintrc.js                     # ESLint configuration
+├── eslint.config.js                 # ESLint flat config (v10)
 ├── .prettierrc                      # Prettier configuration
 ├── package.json                     # Dependencies & scripts
 ├── cypress.config.ts                # Cypress E2E configuration
@@ -370,10 +367,10 @@ This project is part of a learning exercise. Feel free to use and modify as need
 
 ## 🙏 Acknowledgments
 
-- Built with Vue 3, Vite, TypeScript, and Tailwind CSS
+- Built with Vue 3, Vite 8 (Rolldown), TypeScript 6, and Tailwind CSS 3
 - Icons from Heroicons
-- Image processing with html2canvas and jsPDF
-- Testing with Vitest and Cypress
+- Image processing with html2canvas and jsPDF 4
+- Testing with Vitest 4 and Playwright
 
 ---
 

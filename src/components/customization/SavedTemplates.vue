@@ -9,7 +9,7 @@ interface Props {
   modelValue?: SavedTemplate | null
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: SavedTemplate | null]

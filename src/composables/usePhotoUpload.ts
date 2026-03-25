@@ -39,9 +39,8 @@ export const usePhotoUpload = () => {
       processedBlob.value = result.blob
       dataUrl.value = result.dataUrl
       return { blob: result.blob, dataUrl: result.dataUrl }
-    } catch (e: any) {
-      console.log(e.value);
-      error.value = e?.message ?? 'Failed to process image'
+    } catch (e: unknown) {
+      error.value = e instanceof Error ? e.message : 'Failed to process image'
       processedBlob.value = null
       dataUrl.value = ''
       return null

@@ -52,7 +52,7 @@ export const useCache = (config: CacheConfig = {}) => {
       storage.removeItem(testKey)
       isSupported.value = true
       return true
-    } catch (e) {
+    } catch {
       console.warn(`${type} not available, falling back to memory cache`)
       isSupported.value = false
       return false

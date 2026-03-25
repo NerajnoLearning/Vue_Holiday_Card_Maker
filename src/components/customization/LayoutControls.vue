@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-
 interface Props {
   textAlign?: 'left' | 'center' | 'right'
   photoSize?: 'small' | 'medium' | 'large'
@@ -8,7 +6,7 @@ interface Props {
   spacing?: 'compact' | 'normal' | 'relaxed'
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   textAlign: 'center',
   photoSize: 'medium',
   photoPosition: 'center',

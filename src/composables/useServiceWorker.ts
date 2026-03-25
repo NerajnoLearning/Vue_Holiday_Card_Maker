@@ -283,7 +283,7 @@ export const useIsPWA = () => {
   onMounted(() => {
     isPWA.value =
       window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as any).standalone === true ||
+      ('standalone' in window.navigator && window.navigator.standalone === true) ||
       document.referrer.includes('android-app://')
   })
 

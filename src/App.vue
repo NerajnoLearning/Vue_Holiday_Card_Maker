@@ -9,8 +9,8 @@ import HolidaySelector from '@/components/templates/HolidaySelector.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import DarkModeToggle from '@/components/common/DarkModeToggle.vue'
 
-// Initialize dark mode
-const { isDark } = useDarkMode()
+// Initialize dark mode (called for side effect only)
+useDarkMode()
 
 // Lazy loaded components (below the fold or conditional)
 const GreetingCard = defineAsyncComponent(() => import('@/components/card/GreetingCard.vue'))

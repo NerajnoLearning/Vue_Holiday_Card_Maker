@@ -61,7 +61,7 @@ function calculateAspectRatio(
   }
 }
 
-function loadImageFromFile(file: File): Promise<HTMLImageElement> {
+export function loadImageFromFile(file: File): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file)
     const img = new Image()
@@ -69,7 +69,7 @@ function loadImageFromFile(file: File): Promise<HTMLImageElement> {
       URL.revokeObjectURL(url)
       resolve(img)
     }
-    img.onerror = (e) => {
+    img.onerror = () => {
       URL.revokeObjectURL(url)
       reject(new Error('Failed to load image'))
     }
@@ -116,7 +116,7 @@ export const resizeImage = (
 				}
 
 				// Calculate new dimensions
-				let { width, height } = calculateAspectRatio(
+				const { width, height } = calculateAspectRatio(
 					img.width,
 					img.height,
 					options.maxWidth || img.width,
@@ -151,7 +151,7 @@ export const resizeImage = (
 						const shouldConvertToWebP = file.type !== 'image/webp' &&
 							canvas.toDataURL('image/webp').startsWith('data:image/webp');
 
-						const processBlob = (finalBlob: Blob, type: string) => {
+						const processBlob = (finalBlob: Blob, _type: string) => {
 							const url = URL.createObjectURL(finalBlob);
 							const reader = new FileReader();
 

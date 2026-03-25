@@ -13,7 +13,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const emit = defineEmits<{
+defineEmits<{
   close: []
 }>()
 
@@ -43,7 +43,7 @@ const copyShareCode = async () => {
   try {
     await navigator.clipboard.writeText(props.template.shareCode)
     showSuccess('Share code copied to clipboard!')
-  } catch (err) {
+  } catch {
     showError('Failed to copy share code')
   }
 }
@@ -54,7 +54,7 @@ const copyShareUrl = async () => {
   try {
     await navigator.clipboard.writeText(shareUrl.value)
     showSuccess('Share URL copied to clipboard!')
-  } catch (err) {
+  } catch {
     showError('Failed to copy share URL')
   }
 }
@@ -170,7 +170,7 @@ const handleFileImport = async (event: Event) => {
     } else {
       showError('Failed to import template from file')
     }
-  } catch (err) {
+  } catch {
     showError('Invalid template file')
   } finally {
     isImporting.value = false

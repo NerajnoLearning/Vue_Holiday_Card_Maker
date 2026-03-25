@@ -1,4 +1,4 @@
-import { ref, readonly, type Ref } from 'vue'
+import { ref, readonly } from 'vue'
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info'
 
