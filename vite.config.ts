@@ -95,7 +95,7 @@ export default defineConfig({
 
   // Optimize dependencies
   optimizeDeps: {
-    include: ['vue', 'dompurify'],
-    exclude: ['jspdf', 'html2canvas'], // Load on demand
+    include: ['vue', 'dompurify', 'html2canvas'],
+    exclude: ['jspdf'], // Load on demand
   },
 })
